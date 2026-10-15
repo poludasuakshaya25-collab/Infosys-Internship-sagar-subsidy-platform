@@ -1,0 +1,284 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAGAR - Eligibility & Schemes</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <style>
+        body {
+            font-family: "Segoe UI", system-ui, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            color: #1e293b;
+        }
+        .page {
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 0 20px 60px;
+        }
+        .back {
+            color: #000080;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .hero {
+            background: linear-gradient(135deg, #000080, #1b1baa);
+            color: #fff;
+            border-radius: 14px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .hero h1 {
+            margin: 0 0 8px;
+        }
+        .hero p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.78);
+            line-height: 1.6;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+            border: 1px solid #e2e8f0;
+        }
+        .emoji {
+            font-size: 34px;
+        }
+        .card h3 {
+            margin: 10px 0 6px;
+            color: #000080;
+        }
+        .desc {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.55;
+            min-height: 62px;
+        }
+        .meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 14px 0;
+        }
+        .tag {
+            background: #f1f5f9;
+            padding: 5px 8px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .docs {
+            font-size: 12px;
+            color: #475569;
+            margin: 10px 0;
+        }
+        .btn {
+            display: block;
+            text-align: center;
+            background: #000080;
+            color: #fff;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-top: 16px;
+        }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+        .sagar-identity .sagar-mark {
+            width: 60px;
+            height: 60px;
+            flex: 0 0 60px;
+            display: block;
+        }
+        .sagar-identity .sagar-wordmark {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .sagar-identity .sagar-name {
+            font:
+                    800 29px/1.08 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            letter-spacing: -0.7px;
+            margin: 0;
+        }
+        .sagar-identity .sagar-name span {
+            color: #ff9933;
+        }
+        .sagar-identity .sagar-subtitle {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            letter-spacing: 0.65px;
+            color: #53698d;
+            margin-top: 2px;
+        }
+        .sagar-identity .sagar-role {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            margin-top: 3px;
+        }
+        @media (max-width: 600px) {
+            .sagar-identity .sagar-mark {
+                width: 45px;
+                height: 45px;
+                flex-basis: 45px;
+            }
+            .sagar-identity .sagar-name {
+                font-size: 23px;
+            }
+            .sagar-identity .sagar-subtitle {
+                font-size: 9px;
+                letter-spacing: 0.1px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+
+        .sagar-header-return { margin-left:auto; padding:10px 16px; border-radius:8px; background:#000080; color:#fff !important; font-weight:700; font-size:13px; text-decoration:none; white-space:nowrap; }
+        .sagar-header-return:hover { background:#1717a0; }
+        @media(max-width:600px) { .sagar-header-return { font-size:12px; padding:8px 10px; } }
+    </style>
+</head>
+<body>
+<div class="sagar-sticky-header universal-header">
+    <a href="/dashboard" class="brand-block"
+    ><span class="sagar-identity"
+    ><span class="sagar-mark"
+    ><svg
+            class="brand-logo-svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+    >
+              <circle
+                      cx="12"
+                      cy="12"
+                      r="11"
+                      stroke="#000080"
+                      stroke-width="2"
+                      fill="#FFFFFF"
+              />
+              <circle
+                      cx="12"
+                      cy="13"
+                      r="3.5"
+                      stroke="#000080"
+                      stroke-width="1"
+                      stroke-dasharray="1 1"
+              />
+              <path
+                      d="M6 15V10L12 5L18 10V15H6Z"
+                      stroke="#000080"
+                      stroke-width="1.5"
+                      fill="none"
+              />
+              <path
+                      d="M5 18C10 21 14 21 19 18"
+                      stroke="#138808"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+              />
+              <path
+                      d="M12 2V5"
+                      stroke="#FF9933"
+                      stroke-width="2"
+                      stroke-linecap="round"
+              /></svg></span
+    ><span class="sagar-wordmark"
+    ><span class="sagar-name">SAGAR<span>.</span></span
+    ><span class="sagar-subtitle"
+    >SUBSIDY &amp; GRANT ADMINISTRATION</span
+    ><span class="sagar-role">Eligibility Check</span></span
+    ></span
+    ></a
+    >
+    <a class="sagar-header-return" th:href="@{/dashboard/citizen}">← Return to Dashboard</a>
+</div>
+<div class="page">
+    <div class="hero">
+        <h1>Eligibility &amp; Scheme Applications</h1>
+        <p>
+            Select a scheme to see its exact eligibility criteria and document
+            requirements. Mandatory and optional documents are configured
+            separately for every scheme.
+        </p>
+    </div>
+    <div class="grid">
+        <div class="card" th:each="scheme : ${schemes}">
+            <div class="emoji" th:text="${scheme.emoji}">📋</div>
+            <h3 th:text="${scheme.schemeName}">Scheme</h3>
+            <div class="desc" th:text="${scheme.description}">Description</div>
+            <div class="meta">
+            <span
+                    class="tag"
+                    th:text="${'Age ' + scheme.eligibleAgeMin + '–' + scheme.eligibleAgeMax}"
+            >Age</span
+            >
+                <span
+                        class="tag"
+                        th:text="'Income ≤ ₹' + ${#numbers.formatInteger(scheme.maxIncomeThreshold,1,'COMMA')}"
+                >Income</span
+                >
+            </div>
+            <div class="docs">
+                <strong>Mandatory:</strong>
+                <span th:text="${scheme.requiredDocuments}">Documents</span>
+            </div>
+            <div class="docs">
+                <strong>Optional:</strong>
+                <span th:text="${scheme.optionalDocuments}">Documents</span>
+            </div>
+            <a class="btn" th:href="@{/eligibility/{id}(id=${scheme.id})}"
+            >Check Eligibility &amp; Apply →</a
+            >
+        </div>
+    </div>
+</div>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

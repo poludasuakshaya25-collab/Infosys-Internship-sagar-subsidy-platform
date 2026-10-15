@@ -1,0 +1,309 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>SAGAR - Application Result</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <style>
+        body {
+            font-family: "Segoe UI", system-ui, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            color: #1e293b;
+        }
+        .page {
+            max-width: 850px;
+            margin: 35px auto;
+            padding: 0 20px 60px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 3px 18px rgba(0, 0, 0, 0.08);
+        }
+        .hero {
+            background: linear-gradient(135deg, #000080, #1b1baa);
+            color: #fff;
+            padding: 32px;
+        }
+        .hero h1 {
+            margin: 0 0 6px;
+            font-size: 24px;
+        }
+        .hero p {
+            margin: 0;
+            color: #dbeafe;
+        }
+        .score {
+            font-size: 42px;
+            font-weight: 800;
+            margin-top: 14px;
+        }
+        .body {
+            padding: 28px 32px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 0;
+            font-size: 13px;
+        }
+        .ok {
+            color: #166534;
+            font-weight: 800;
+        }
+        .docs {
+            margin-top: 25px;
+        }
+        .doc {
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-radius: 7px;
+            margin: 7px 0;
+            font-size: 13px;
+        }
+        .btn {
+            display: block;
+            text-align: center;
+            background: #000080;
+            color: #fff;
+            text-decoration: none;
+            padding: 13px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-top: 25px;
+        }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+        .sagar-identity .sagar-mark {
+            width: 60px;
+            height: 60px;
+            flex: 0 0 60px;
+            display: block;
+        }
+        .sagar-identity .sagar-wordmark {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .sagar-identity .sagar-name {
+            font:
+                    800 29px/1.08 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            letter-spacing: -0.7px;
+            margin: 0;
+        }
+        .sagar-identity .sagar-name span {
+            color: #ff9933;
+        }
+        .sagar-identity .sagar-subtitle {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            letter-spacing: 0.65px;
+            color: #53698d;
+            margin-top: 2px;
+        }
+        .sagar-identity .sagar-role {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            margin-top: 3px;
+        }
+        @media (max-width: 600px) {
+            .sagar-identity .sagar-mark {
+                width: 45px;
+                height: 45px;
+                flex-basis: 45px;
+            }
+            .sagar-identity .sagar-name {
+                font-size: 23px;
+            }
+            .sagar-identity .sagar-subtitle {
+                font-size: 9px;
+                letter-spacing: 0.1px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="sagar-sticky-header universal-header">
+    <a href="/dashboard" class="brand-block"
+    ><span class="sagar-identity"
+    ><span class="sagar-mark"
+    ><svg
+            class="brand-logo-svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+    >
+              <circle
+                      cx="12"
+                      cy="12"
+                      r="11"
+                      stroke="#000080"
+                      stroke-width="2"
+                      fill="#FFFFFF"
+              />
+              <circle
+                      cx="12"
+                      cy="13"
+                      r="3.5"
+                      stroke="#000080"
+                      stroke-width="1"
+                      stroke-dasharray="1 1"
+              />
+              <path
+                      d="M6 15V10L12 5L18 10V15H6Z"
+                      stroke="#000080"
+                      stroke-width="1.5"
+                      fill="none"
+              />
+              <path
+                      d="M5 18C10 21 14 21 19 18"
+                      stroke="#138808"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+              />
+              <path
+                      d="M12 2V5"
+                      stroke="#FF9933"
+                      stroke-width="2"
+                      stroke-linecap="round"
+              /></svg></span
+    ><span class="sagar-wordmark"
+    ><span class="sagar-name">SAGAR<span>.</span></span
+    ><span class="sagar-subtitle"
+    >SUBSIDY &amp; GRANT ADMINISTRATION</span
+    ><span class="sagar-role">Application Submitted</span></span
+    ></span
+    ></a
+    >
+</div>
+<div class="page">
+    <div class="card">
+        <div class="hero">
+            <h1>Application Submitted</h1>
+            <p th:text="${scheme.schemeName}">Scheme</p>
+            <div class="score" th:text="${score} + '/100'">0/100</div>
+        </div>
+        <div class="body">
+            <div class="row">
+                <span>Status</span><span class="ok">FIELD VERIFICATION</span>
+            </div>
+            <div class="row">
+            <span>Mandatory documents</span
+            ><span
+                    th:text="${scoreResult.uploadedMandatoryDocuments + '/' + scoreResult.totalMandatoryDocuments}"
+            >0/0</span
+            >
+            </div>
+            <div class="row">
+            <span>Optional documents</span
+            ><span
+                    th:text="${scoreResult.uploadedOptionalDocuments + '/' + scoreResult.totalOptionalDocuments}"
+            >0/0</span
+            >
+            </div>
+            <div class="row">
+            <span>Profile points</span
+            ><span th:text="${scoreResult.profilePts + '/50'}">0/50</span>
+            </div>
+            <div class="row">
+            <span>Mandatory document points</span
+            ><span th:text="${scoreResult.mandatoryDocumentPts + '/40'}"
+            >0/40</span
+            >
+            </div>
+            <div class="row">
+            <span>Optional document points</span
+            ><span th:text="${scoreResult.optionalDocumentPts + '/10'}"
+            >0/10</span
+            >
+            </div>
+            <div class="docs">
+                <h3>Uploaded documents</h3>
+                <div
+                        class="doc"
+                        th:each="doc : ${applicationDocuments}"
+                        th:text="${doc.documentName + ' — ' + doc.originalFilename}"
+                >
+                    Document
+                </div>
+            </div>
+            <div
+                    style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 25px"
+            >
+                <a
+                        class="btn"
+                        style="margin-top: 0; flex: 1; min-width: 220px"
+                        th:href="@{/application/{id}(id=${application.id})}"
+                >👁 View Application Details</a
+                >
+                <a
+                        class="btn"
+                        style="
+                margin-top: 0;
+                flex: 1;
+                min-width: 220px;
+                background: #e67e22;
+              "
+                        th:href="@{/application/{id}/download(id=${application.id})}"
+                >📄 Download Application</a
+                >
+                <a
+                        class="btn"
+                        style="
+                margin-top: 0;
+                flex: 1;
+                min-width: 220px;
+                background: #475569;
+              "
+                        href="/dashboard/citizen"
+                >Return to My Dashboard</a
+                >
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

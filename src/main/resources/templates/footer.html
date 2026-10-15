@@ -1,0 +1,53 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<footer
+        th:fragment="siteFooter"
+        class="sagar-footer"
+        aria-label="SAGAR site footer"
+>
+    <div class="sagar-footer__stripe" aria-hidden="true"></div>
+    <div class="sagar-footer__inner">
+        <div class="sagar-footer__main">
+            <div class="sagar-footer__about">
+                <div class="sagar-footer__brand">SAGAR<span>.</span></div>
+                <div class="sagar-footer__eyebrow">
+                    SUBSIDY &amp; GRANT ADMINISTRATION PORTAL
+                </div>
+                <p>
+                    Simplifying subsidy applications through secure verification,
+                    transparent tracking, and accountable disbursement.
+                </p>
+            </div>
+            <nav class="sagar-footer__links" aria-label="Quick links">
+                <h2>Quick Links</h2>
+                <a th:href="@{/}">Home</a>
+                <a th:href="@{/#schemes}">Explore Schemes</a>
+                <a th:href="@{/login}">Login</a>
+                <a th:href="@{/register}">Register</a>
+            </nav>
+            <section class="sagar-footer__links" aria-label="Platform features">
+                <h2>Platform Features</h2>
+                <span>Eligibility Assessment</span>
+                <span>Document Verification</span>
+                <span>Application Tracking</span>
+                <span>Fund Disbursement</span>
+            </section>
+            <section class="sagar-footer__links" aria-label="Project information">
+                <h2>About the Project</h2>
+                <span>Infosys Springboard Internship</span>
+                <span>Secure OTP Login</span>
+                <span>Role-Based Workflows</span>
+                <span>Academic Demonstration</span>
+            </section>
+        </div>
+        <div class="sagar-footer__bottom">
+            <span>© 2026 SAGAR · Infosys Springboard Internship Project</span>
+            <span
+            >Demonstration platform — not an official government service.</span
+            >
+        </div>
+    </div>
+</footer>
+</body>
+</html>

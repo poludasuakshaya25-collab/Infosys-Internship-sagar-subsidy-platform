@@ -1,0 +1,658 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="'SAGAR - ' + ${scheme.schemeName}">Scheme Detail</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Segoe UI", system-ui, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            color: #1e293b;
+        }
+        .page-wrap {
+            max-width: 860px;
+            margin: 36px auto;
+            padding: 0 20px 60px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #000080;
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            margin-bottom: 22px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        .detail-hero {
+            background: linear-gradient(135deg, #000080, #001aaa);
+            padding: 32px 36px;
+            color: white;
+        }
+        .detail-hero .emoji {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+        }
+        .detail-hero h1 {
+            margin: 0 0 8px;
+            font-size: 26px;
+            font-weight: 800;
+        }
+        .detail-hero .benefit-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+        .detail-hero p {
+            margin: 12px 0 0;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.65;
+            max-width: 700px;
+        }
+
+        .detail-body {
+            padding: 32px 36px;
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #000080;
+            margin: 0 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-divider {
+            border: none;
+            border-top: 1px solid #f1f5f9;
+            margin: 28px 0;
+        }
+
+        /* Eligibility table */
+        .elig-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+        }
+        .elig-table thead tr {
+            background: #f8fafc;
+        }
+        .elig-table thead th {
+            padding: 10px 14px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-weight: 800;
+            color: #64748b;
+            text-align: left;
+        }
+        .elig-table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .elig-table tbody td {
+            padding: 12px 14px;
+            vertical-align: middle;
+        }
+        .elig-table .el-criterion {
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .elig-table .el-req {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .mandatory-badge {
+            display: inline-block;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 6px;
+        }
+        .optional-badge {
+            display: inline-block;
+            background: #dcfce7;
+            color: #166534;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 6px;
+        }
+
+        /* Document list */
+        .doc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .doc-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        .doc-item.optional {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        .doc-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .doc-name {
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .doc-desc {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        /* Budget info */
+        .budget-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+        }
+        @media (max-width: 560px) {
+            .budget-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .budget-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .budget-card .bl {
+            font-size: 10px;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .budget-card .bv {
+            font-size: 18px;
+            font-weight: 800;
+            color: #000080;
+        }
+
+        .apply-cta {
+            display: block;
+            text-align: center;
+            background: #e67e22;
+            color: white;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 28px;
+            transition: background 0.15s;
+        }
+        .apply-cta:hover {
+            background: #d35400;
+        }
+        .detail-card {
+            overflow: hidden;
+        }
+        .sagar-detail-photo {
+            height: 265px;
+            background: #eef4fb;
+        }
+        .sagar-detail-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .detail-hero {
+            border-radius: 0 !important;
+        }
+        @media (min-width: 900px) {
+            .detail-card {
+                display: grid;
+                grid-template-columns: 36% 64%;
+            }
+            .sagar-detail-photo {
+                height: 100%;
+                max-height: 370px;
+            }
+            .detail-body {
+                grid-column: 1/-1;
+            }
+        }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+        .sagar-identity .sagar-mark {
+            width: 60px;
+            height: 60px;
+            flex: 0 0 60px;
+            display: block;
+        }
+        .sagar-identity .sagar-wordmark {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .sagar-identity .sagar-name {
+            font:
+                    800 29px/1.08 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            letter-spacing: -0.7px;
+            margin: 0;
+        }
+        .sagar-identity .sagar-name span {
+            color: #ff9933;
+        }
+        .sagar-identity .sagar-subtitle {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            letter-spacing: 0.65px;
+            color: #53698d;
+            margin-top: 2px;
+        }
+        .sagar-identity .sagar-role {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            margin-top: 3px;
+        }
+        @media (max-width: 600px) {
+            .sagar-identity .sagar-mark {
+                width: 45px;
+                height: 45px;
+                flex-basis: 45px;
+            }
+            .sagar-identity .sagar-name {
+                font-size: 23px;
+            }
+            .sagar-identity .sagar-subtitle {
+                font-size: 9px;
+                letter-spacing: 0.1px;
+            }
+        }
+
+        /* Scheme details: a landscape image and summary, then the complete requirements below. */
+        .detail-card {display:block!important;max-width:1120px;margin-inline:auto;}
+        .sagar-detail-photo {height:clamp(250px,32vw,385px)!important;max-height:none!important;overflow:hidden;background:#eaf1fa;}
+        .sagar-detail-photo img {width:100%;height:100%;object-fit:cover;object-position:center 42%;display:block;}
+        .detail-hero {border-radius:0!important;}
+        .detail-body {grid-column:auto!important;}
+        @media(min-width:900px){.detail-card{display:block!important;grid-template-columns:none!important;}}
+        @media(max-width:600px){.sagar-detail-photo{height:220px!important;}}
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+
+        .sagar-header-return {
+            margin-left: auto;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: #000080;
+            color: #fff !important;
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .sagar-header-return:hover {
+            background: #1717a0;
+        }
+        @media (max-width: 600px) {
+            .sagar-header-return {
+                font-size: 12px;
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="sagar-sticky-header universal-header">
+    <a href="/dashboard" class="brand-block">
+        <span class="sagar-identity"
+        ><span class="sagar-mark"
+        ><svg
+                class="brand-logo-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+        >
+              <circle
+                      cx="12"
+                      cy="12"
+                      r="11"
+                      stroke="#000080"
+                      stroke-width="2"
+                      fill="#FFFFFF"
+              />
+              <circle
+                      cx="12"
+                      cy="13"
+                      r="3.5"
+                      stroke="#000080"
+                      stroke-width="1"
+                      stroke-dasharray="1 1"
+              />
+              <path
+                      d="M6 15V10L12 5L18 10V15H6Z"
+                      stroke="#000080"
+                      stroke-width="1.5"
+                      fill="none"
+              />
+              <path
+                      d="M5 18C10 21 14 21 19 18"
+                      stroke="#138808"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+              />
+              <path
+                      d="M12 2V5"
+                      stroke="#FF9933"
+                      stroke-width="2"
+                      stroke-linecap="round"
+              /></svg></span
+        ><span class="sagar-wordmark"
+        ><span class="sagar-name">SAGAR<span>.</span></span
+        ><span class="sagar-subtitle"
+        >SUBSIDY &amp; GRANT ADMINISTRATION</span
+        ><span class="sagar-role">Scheme Details</span></span
+        ></span
+        >
+    </a>
+    <a class="sagar-header-return" th:if="${param.from != null and param.from[0] == 'dashboard'}"
+       th:href="@{/dashboard/citizen}">← Return to Dashboard</a>
+    <a class="sagar-header-return" th:unless="${param.from != null and param.from[0] == 'dashboard'}"
+       href="/#schemes">← Return to Schemes</a>
+</div>
+
+<div class="page-wrap">
+    <div class="detail-card">
+        <div class="sagar-detail-photo">
+            <img
+                    id="sagar-detail-img"
+                    th:src="@{/images/scheme-housing.webp}"
+                    th:attr="data-image-base=@{/images/},data-scheme-name=${scheme.schemeName}"
+                    th:alt="${scheme.schemeName}"
+            />
+        </div>
+        <div class="detail-hero">
+            <span class="emoji" th:text="${scheme.emoji}">📋</span>
+            <h1 th:text="${scheme.schemeName}">Scheme Name</h1>
+            <span
+                    class="benefit-tag"
+                    th:if="${scheme.benefitSummary != null}"
+                    th:text="'💰 ' + ${scheme.benefitSummary}"
+            >Benefit</span
+            >
+            <p th:text="${scheme.description}">Description</p>
+        </div>
+
+        <div class="detail-body">
+            <!-- Eligibility Criteria -->
+            <div class="section-title">📋 Eligibility Criteria</div>
+            <table class="elig-table">
+                <thead>
+                <tr>
+                    <th>Criterion</th>
+                    <th>Requirement</th>
+                    <th>Type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="el-criterion">Age</td>
+                    <td
+                            class="el-req"
+                            th:text="${scheme.eligibleAgeMin + '–' + scheme.eligibleAgeMax + ' years'}"
+                    >
+                        —
+                    </td>
+                    <td><span class="mandatory-badge">Mandatory</span></td>
+                </tr>
+                <tr>
+                    <td class="el-criterion">Annual Family Income</td>
+                    <td
+                            class="el-req"
+                            th:text="'≤ ₹' + ${#numbers.formatInteger(scheme.maxIncomeThreshold,1,'COMMA')}"
+                    >
+                        —
+                    </td>
+                    <td><span class="mandatory-badge">Mandatory</span></td>
+                </tr>
+                <tr>
+                    <td class="el-criterion">Nationality</td>
+                    <td class="el-req">Indian Citizen</td>
+                    <td><span class="mandatory-badge">Mandatory</span></td>
+                </tr>
+                <tr>
+                    <td class="el-criterion">Government ID</td>
+                    <td class="el-req">Valid Aadhaar or PAN</td>
+                    <td><span class="mandatory-badge">Mandatory</span></td>
+                </tr>
+                <tr>
+                    <td class="el-criterion">Bank Account</td>
+                    <td class="el-req">Active bank account linked to Aadhaar</td>
+                    <td><span class="mandatory-badge">Mandatory</span></td>
+                </tr>
+                <tr th:if="${scheme.genderRestricted}">
+                    <td class="el-criterion">Gender</td>
+                    <td class="el-req" th:text="${scheme.requiredGender}">—</td>
+                    <td><span class="mandatory-badge">Mandatory</span></td>
+                </tr>
+                <tr th:if="${scheme.occupationRestricted}">
+                    <td class="el-criterion">Occupation</td>
+                    <td class="el-req" th:text="${scheme.requiredOccupation}">—</td>
+                    <td><span class="mandatory-badge">Mandatory</span></td>
+                </tr>
+                <tr th:if="${scheme.requiresDisability}">
+                    <td class="el-criterion">Disability Status</td>
+                    <td class="el-req">
+                        Must hold valid UDID certificate with ≥40% disability
+                    </td>
+                    <td><span class="mandatory-badge">Mandatory</span></td>
+                </tr>
+                <tr th:if="${scheme.residenceRestricted}">
+                    <td class="el-criterion">Residence Type</td>
+                    <td
+                            class="el-req"
+                            th:text="${scheme.requiredResidenceType} + ' area only'"
+                    >
+                        —
+                    </td>
+                    <td><span class="mandatory-badge">Mandatory</span></td>
+                </tr>
+                <tr>
+                    <td class="el-criterion">Previous Duplicate Benefit</td>
+                    <td class="el-req">
+                        Must not already receive the same benefit from another scheme
+                    </td>
+                    <td><span class="mandatory-badge">Mandatory</span></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <hr class="section-divider" />
+
+            <!-- Budget Info -->
+            <div class="section-title">💰 Scheme Budget Status</div>
+            <div class="budget-grid">
+                <div class="budget-card">
+                    <div class="bl">Total Budget</div>
+                    <div
+                            class="bv"
+                            th:text="'₹' + ${#numbers.formatInteger(scheme.totalRegionalBudget,1,'COMMA')}"
+                    >
+                        —
+                    </div>
+                </div>
+                <div class="budget-card">
+                    <div class="bl">Remaining Budget</div>
+                    <div
+                            class="bv"
+                            th:text="'₹' + ${#numbers.formatInteger(scheme.remainingBudget,1,'COMMA')}"
+                    >
+                        —
+                    </div>
+                </div>
+                <div class="budget-card">
+                    <div class="bl">Benefit Amount</div>
+                    <div
+                            class="bv"
+                            th:text="${scheme.benefitSummary != null ? scheme.benefitSummary : 'As per scheme rules'}"
+                    >
+                        —
+                    </div>
+                </div>
+            </div>
+
+            <hr class="section-divider" />
+
+            <!-- Required Documents -->
+            <div class="section-title">📎 Required Documents</div>
+            <ul class="doc-list" th:if="${scheme.requiredDocuments != null}">
+                <li
+                        class="doc-item"
+                        th:each="doc : ${#strings.arraySplit(scheme.requiredDocuments, ',')}"
+                >
+                    <span class="doc-icon">📄</span>
+                    <div>
+                        <div class="doc-name" th:text="${#strings.trim(doc)}">
+                            Document
+                        </div>
+                        <div class="doc-desc">
+                            Required for application — must be uploaded during submission
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <hr class="section-divider" />
+
+            <!-- Optional Documents -->
+            <div class="section-title">
+                📈 Optional Documents
+                <span style="font-size: 12px; color: #065f46; font-weight: 700"
+                >(earn bonus points)</span
+                >
+            </div>
+            <p style="font-size: 13px; color: #64748b; margin: 0 0 14px">
+                Upload these optional documents when applying to improve your
+                eligibility score by up to +15 points.
+            </p>
+            <ul class="doc-list" th:if="${scheme.optionalDocuments != null}">
+                <li
+                        class="doc-item optional"
+                        th:each="doc : ${#strings.arraySplit(scheme.optionalDocuments, ',')}"
+                >
+                    <span class="doc-icon">📄</span>
+                    <div>
+                        <div class="doc-name" th:text="${#strings.trim(doc)}">
+                            Document
+                        </div>
+                        <div class="doc-desc">
+                            Optional — uploading earns +5 bonus points toward your
+                            eligibility score
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <a th:href="@{'/eligibility/' + ${scheme.id}}" class="apply-cta">
+                Apply for <span th:text="${scheme.schemeName}">Scheme</span> →
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+<script>
+    (function () {
+        var img = document.getElementById("sagar-detail-img");
+        if (!img) return;
+        var n = (img.dataset.schemeName || "").toLowerCase();
+        var f = /agri|farm|crop|irrigat/.test(n)
+            ? "scheme-farming.webp"
+            : /educ|scholar|student/.test(n)
+                ? "scheme-education.webp"
+                : /women|entrepren|livelihood/.test(n)
+                    ? "scheme-women.webp"
+                    : /senior|elder|pension/.test(n) ? "scheme-senior.webp" : /divyang|disab|pwd/.test(n) ? "scheme-disability.webp" : /skill|vocational|training/.test(n) ? "scheme-skill.webp" : "scheme-housing.webp";
+        img.src = (img.dataset.imageBase || "/images/") + f;
+    })();
+</script>
+</body>
+</html>

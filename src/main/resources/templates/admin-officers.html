@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SAGAR - Officer Management</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background: #f4f7fb;
+            color: #172033;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+        a {
+            text-decoration: none;
+        }
+        .header {
+            background: #fff;
+            border-bottom: 3px solid #000080;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+            padding: 15px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        .brand h1 {
+            margin: 0;
+            color: #000080;
+            font-size: 22px;
+            font-weight: 900;
+        }
+        .brand h1 span {
+            color: #e67e22;
+        }
+        .brand p {
+            margin: 2px 0 0;
+            color: #64748b;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .nav {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .nav a,
+        .logout {
+            border: 1px solid #dbe3ef;
+            background: #fff;
+            color: #000080;
+            border-radius: 7px;
+            padding: 8px 11px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .page {
+            max-width: 1400px;
+            margin: auto;
+            padding: 26px 20px 60px;
+        }
+        .hero {
+            background: linear-gradient(135deg, #000080, #172554);
+            color: #fff;
+            border-radius: 14px;
+            padding: 25px 30px;
+            margin-bottom: 20px;
+        }
+        .hero h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .hero p {
+            margin: 6px 0 0;
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 12px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 18px;
+            align-items: start;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 21px 23px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.045);
+            margin-bottom: 18px;
+        }
+        .card h3 {
+            margin: 0;
+            color: #000080;
+            font-size: 16px;
+        }
+        .sub {
+            margin: 5px 0 18px;
+            color: #64748b;
+            font-size: 11px;
+        }
+        .label {
+            display: block;
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin: 11px 0 5px;
+        }
+        .field,
+        .select {
+            width: 100%;
+            border: 1px solid #dbe3ef;
+            border-radius: 7px;
+            padding: 9px 10px;
+            font: inherit;
+            font-size: 12px;
+            background: #fff;
+        }
+        .btn {
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 13px;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .primary {
+            background: #000080;
+            color: #fff;
+        }
+        .orange {
+            background: #e67e22;
+            color: #fff;
+        }
+        .danger {
+            background: #b91c1c;
+            color: #fff;
+        }
+        .light {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #dbe3ef;
+        }
+        .flash {
+            border-radius: 9px;
+            padding: 11px 14px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .copy {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            border-radius: 9px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 11px;
+            word-break: break-all;
+        }
+        .table-wrap {
+            overflow: auto;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .table th {
+            background: #f8fafc;
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 9px;
+            text-align: left;
+            padding: 10px 9px;
+        }
+        .table td {
+            padding: 10px 9px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: top;
+        }
+        .badge {
+            display: inline-block;
+            border-radius: 15px;
+            padding: 4px 8px;
+            font-size: 9px;
+            font-weight: 900;
+            background: #eef2ff;
+            color: #3730a3;
+        }
+        .muted {
+            color: #94a3b8;
+            font-size: 10px;
+        }
+        .actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .actions form {
+            margin: 0;
+        }
+        .notice {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            border-radius: 8px;
+            padding: 11px;
+            font-size: 10px;
+            line-height: 1.5;
+            margin-top: 14px;
+        }
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                padding: 13px 16px;
+            }
+            .page {
+                padding: 18px 12px;
+            }
+        }
+    </style>
+    <style>
+        /* SAGAR header navigation additions — scoped to avoid changing page layouts */
+        .sagar-extra-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 11px;
+            border: 1px solid #dbe3ef;
+            border-radius: 7px;
+            background: #fff;
+            color: #000080 !important;
+            text-decoration: none;
+            font:
+                    700 12px "Segoe UI",
+                    Arial,
+                    sans-serif;
+            white-space: nowrap;
+        }
+        .sagar-extra-link:hover {
+            background: #eef2ff;
+        }
+        .sagar-extra-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .sagar-extra-logout {
+            padding: 7px 11px;
+            border: 1px solid #000080;
+            border-radius: 7px;
+            background: white;
+            color: #000080;
+            font:
+                    700 12px "Segoe UI",
+                    Arial,
+                    sans-serif;
+            cursor: pointer;
+        }
+        @media (max-width: 720px) {
+            .sagar-extra-nav {
+                gap: 5px;
+            }
+            .sagar-extra-link,
+            .sagar-extra-logout {
+                font-size: 11px;
+                padding: 6px 8px;
+            }
+        }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+        .sagar-identity .sagar-mark {
+            width: 60px;
+            height: 60px;
+            flex: 0 0 60px;
+            display: block;
+        }
+        .sagar-identity .sagar-wordmark {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .sagar-identity .sagar-name {
+            font:
+                    800 29px/1.08 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            letter-spacing: -0.7px;
+            margin: 0;
+        }
+        .sagar-identity .sagar-name span {
+            color: #ff9933;
+        }
+        .sagar-identity .sagar-subtitle {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            letter-spacing: 0.65px;
+            color: #53698d;
+            margin-top: 2px;
+        }
+        .sagar-identity .sagar-role {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            margin-top: 3px;
+        }
+        @media (max-width: 600px) {
+            .sagar-identity .sagar-mark {
+                width: 45px;
+                height: 45px;
+                flex-basis: 45px;
+            }
+            .sagar-identity .sagar-name {
+                font-size: 23px;
+            }
+            .sagar-identity .sagar-subtitle {
+                font-size: 9px;
+                letter-spacing: 0.1px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="sagar-sticky-header header">
+    <div class="brand">
+        <span class="sagar-identity"
+        ><span class="sagar-mark"
+        ><svg
+                class="brand-logo-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+        >
+              <circle
+                      cx="12"
+                      cy="12"
+                      r="11"
+                      stroke="#000080"
+                      stroke-width="2"
+                      fill="#FFFFFF"
+              />
+              <circle
+                      cx="12"
+                      cy="13"
+                      r="3.5"
+                      stroke="#000080"
+                      stroke-width="1"
+                      stroke-dasharray="1 1"
+              />
+              <path
+                      d="M6 15V10L12 5L18 10V15H6Z"
+                      stroke="#000080"
+                      stroke-width="1.5"
+                      fill="none"
+              />
+              <path
+                      d="M5 18C10 21 14 21 19 18"
+                      stroke="#138808"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+              />
+              <path
+                      d="M12 2V5"
+                      stroke="#FF9933"
+                      stroke-width="2"
+                      stroke-linecap="round"
+              /></svg></span
+        ><span class="sagar-wordmark"
+        ><span class="sagar-name">SAGAR<span>.</span></span
+        ><span class="sagar-subtitle"
+        >SUBSIDY &amp; GRANT ADMINISTRATION</span
+        ><span class="sagar-role">Officer Management</span></span
+        ></span
+        >
+    </div>
+    <nav class="nav">
+        <a class="sagar-extra-link" th:href="@{/eligibility/admin/monitor}"
+        >Monitoring</a
+        ><a class="sagar-extra-link" th:href="@{/admin/audit}">Audit Logs</a
+    ><a href="/admin/dashboard">← Admin Dashboard</a>
+        <form th:action="@{/logout}" method="post" style="margin: 0">
+            <button class="logout">Logout</button>
+        </form>
+    </nav>
+</header>
+<main class="page">
+    <section class="hero">
+        <h2>Officer Management</h2>
+        <p>
+            Invite authorized government officers, review registrations and
+            control account access. Existing subsidy workflow is unchanged.
+        </p>
+    </section>
+    <div th:if="${success}" class="flash success" th:text="${success}"></div>
+    <div th:if="${error}" class="flash error" th:text="${error}"></div>
+    <div th:if="${invitationLink}" class="copy">
+        <strong>Development invitation link:</strong><br /><span
+            id="inviteLink"
+            th:text="${invitationLink}"
+    ></span
+    ><br /><button
+            class="btn light"
+            type="button"
+            style="margin-top: 8px"
+            onclick="
+            navigator.clipboard.writeText(
+              document.getElementById('inviteLink').innerText,
+            )
+          "
+    >
+        Copy link
+    </button>
+        <div class="muted" style="margin-top: 6px">
+            Shown so localhost testing works before SMTP is configured. Production
+            email delivery will use the same secure token.
+        </div>
+    </div>
+    <div class="grid">
+        <div>
+            <section class="card">
+                <h3>✉ Invite Officer</h3>
+                <p class="sub">
+                    The Admin assigns role and jurisdiction before the officer can
+                    register.
+                </p>
+                <form th:action="@{/admin/officers/invite}" method="post">
+                    <label class="label">Officer Name</label
+                    ><input
+                        class="field"
+                        name="officerName"
+                        required
+                        maxlength="120"
+                />
+                    <label class="label">Official Email</label
+                    ><input
+                        class="field"
+                        name="email"
+                        type="email"
+                        required
+                        maxlength="180"
+                />
+                    <label class="label">Role</label
+                    ><select
+                        class="select"
+                        name="role"
+                        id="role"
+                        required
+                        onchange="toggleDistrict()"
+                >
+                    <option value="">Select role</option>
+                    <option value="ROLE_FIELD_OFFICER">Field Officer</option>
+                    <option value="ROLE_DISTRICT_OFFICER">District Officer</option>
+                    <option value="ROLE_FINANCE_APPROVER">Finance Approver</option>
+                </select>
+                    <label class="label">State</label
+                    ><input
+                        class="field"
+                        name="state"
+                        required
+                        placeholder="e.g. Maharashtra"
+                />
+                    <div id="districtWrap">
+                        <label class="label">District</label
+                        ><input
+                            class="field"
+                            id="district"
+                            name="district"
+                            placeholder="e.g. Solapur"
+                    />
+                    </div>
+                    <button
+                            class="btn primary"
+                            style="margin-top: 16px"
+                            type="submit"
+                    >
+                        Create Secure Invitation
+                    </button>
+                </form>
+                <div class="notice">
+                    Finance is state-scoped, so district is not required for Finance.
+                    Field and District officer invitations require a district.
+                </div>
+            </section>
+            <section class="card">
+                <h3>Invitation History</h3>
+                <p class="sub">
+                    Only a hash of each secure token is stored in the database.
+                </p>
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="i:${invitations}">
+                            <td>
+                                <strong th:text="${i.email}">email</strong><br /><span
+                                    class="muted"
+                                    th:text="${i.state + (i.district != null ? ' / ' + i.district : '')}"
+                            >scope</span
+                            >
+                            </td>
+                            <td
+                                    th:text="${#strings.replace(#strings.replace(i.role,'ROLE_',''),'_',' ')}"
+                            >
+                                Role
+                            </td>
+                            <td>
+                      <span class="badge" th:text="${i.status}">PENDING</span
+                      ><br /><span
+                                    class="muted"
+                                    th:text="${#temporals.format(i.expiresAt,'dd MMM HH:mm')}"
+                            >expiry</span
+                            >
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(invitations)}">
+                            <td colspan="3" class="muted">No invitations yet.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <section class="card">
+            <h3>👥 Officer Accounts</h3>
+            <p class="sub">
+                New registrations remain blocked until Admin approval. Legacy
+                Milestone 1–3 test accounts remain active for compatibility.
+            </p>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Officer</th>
+                        <th>Role</th>
+                        <th>Jurisdiction</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="o:${officers}">
+                        <td>
+                            <strong
+                                    th:text="${o.fullName != null ? o.fullName : o.email}"
+                            >Officer</strong
+                            ><br /><span class="muted" th:text="${o.email}">email</span
+                        ><br /><span
+                                class="muted"
+                                th:if="${o.username}"
+                                th:text="'@' + ${o.username}"
+                        >username</span
+                        >
+                        </td>
+                        <td>
+                    <span
+                            class="badge"
+                            th:text="${#strings.replace(#strings.replace(#strings.toString(o.roles),'ROLE_',''),'_',' ')}"
+                    >ROLE</span
+                    >
+                        </td>
+                        <td
+                                th:text="${o.assignedState != null ? o.assignedState + (o.assignedDistrict != null ? ' / ' + o.assignedDistrict : '') : 'Legacy test account'}"
+                        >
+                            Scope
+                        </td>
+                        <td>
+                    <span
+                            class="badge"
+                            th:text="${o.accountStatus == null or #strings.isEmpty(o.accountStatus) ? 'ACTIVE (LEGACY)' : o.accountStatus}"
+                    >ACTIVE</span
+                    >
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <form
+                                        th:if="${o.accountStatus == 'PENDING_APPROVAL'}"
+                                        th:action="@{/admin/officers/{id}/approve(id=${o.id})}"
+                                        method="post"
+                                >
+                                    <button class="btn primary">Approve</button>
+                                </form>
+                                <form
+                                        th:if="${o.accountStatus == 'PENDING_APPROVAL'}"
+                                        th:action="@{/admin/officers/{id}/reject(id=${o.id})}"
+                                        method="post"
+                                >
+                                    <button class="btn danger">Reject</button>
+                                </form>
+                                <form
+                                        th:if="${o.accountStatus == 'ACTIVE'}"
+                                        th:action="@{/admin/officers/{id}/suspend(id=${o.id})}"
+                                        method="post"
+                                >
+                                    <button class="btn danger">Suspend</button>
+                                </form>
+                                <form
+                                        th:if="${o.accountStatus == 'SUSPENDED'}"
+                                        th:action="@{/admin/officers/{id}/reactivate(id=${o.id})}"
+                                        method="post"
+                                >
+                                    <button class="btn primary">Reactivate</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(officers)}">
+                        <td colspan="5" class="muted">No officer accounts found.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</main>
+<script>
+    function toggleDistrict() {
+        const finance =
+            document.getElementById("role").value === "ROLE_FINANCE_APPROVER";
+        document.getElementById("districtWrap").style.display = finance
+            ? "none"
+            : "block";
+        document.getElementById("district").required = !finance;
+        if (finance) document.getElementById("district").value = "";
+    }
+    toggleDistrict();
+</script>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

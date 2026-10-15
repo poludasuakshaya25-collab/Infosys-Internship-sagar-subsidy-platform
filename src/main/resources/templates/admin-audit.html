@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>SAGAR Portal - Audit Trail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <style>
+        body {
+            margin: 0;
+            background: #f4f7fb;
+            color: #17233c;
+            font-family: Arial, sans-serif;
+        }
+        .top {
+            background: #fff;
+            border-top: 4px solid #24344f;
+            border-bottom: 3px solid #ef7d1a;
+            padding: 16px 26px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .brand {
+            color: #07178f;
+            font-size: 25px;
+            font-weight: 800;
+        }
+        .brand span {
+            color: #ef7d1a;
+        }
+        .top a {
+            color: #07178f;
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 18px;
+        }
+        .wrap {
+            max-width: 1450px;
+            margin: 28px auto;
+            padding: 0 18px;
+        }
+        h1 {
+            color: #07178f;
+            margin-bottom: 4px;
+        }
+        .muted {
+            color: #73819a;
+        }
+        .card {
+            background: #fff;
+            border-radius: 9px;
+            box-shadow: 0 5px 20px rgba(31, 45, 61, 0.07);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(160px, 1fr));
+            gap: 12px;
+        }
+        label {
+            display: block;
+            color: #53627a;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        input,
+        select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ced7e5;
+            border-radius: 5px;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        button,
+        .button {
+            border: 0;
+            border-radius: 5px;
+            padding: 10px 18px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+        button {
+            background: #07178f;
+            color: #fff;
+        }
+        .button {
+            background: #edf2f8;
+            color: #17233c;
+        }
+        .table-wrap {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background: #07178f;
+            color: #fff;
+            text-align: left;
+            padding: 10px;
+            white-space: nowrap;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e8edf4;
+            vertical-align: top;
+        }
+        .tag {
+            display: inline-block;
+            background: #eef2ff;
+            color: #07178f;
+            padding: 4px 7px;
+            border-radius: 4px;
+            font-weight: 800;
+        }
+        .value {
+            max-width: 240px;
+            word-break: break-word;
+            color: #53627a;
+        }
+        .pager {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+        }
+        .pager a {
+            color: #07178f;
+            font-weight: 800;
+            text-decoration: none;
+        }
+        .empty {
+            padding: 35px;
+            text-align: center;
+            color: #73819a;
+        }
+        @media (max-width: 900px) {
+            .filters {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 560px) {
+            .filters {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <style>
+        /* SAGAR header navigation additions — scoped to avoid changing page layouts */
+        .sagar-extra-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 11px;
+            border: 1px solid #dbe3ef;
+            border-radius: 7px;
+            background: #fff;
+            color: #000080 !important;
+            text-decoration: none;
+            font:
+                    700 12px "Segoe UI",
+                    Arial,
+                    sans-serif;
+            white-space: nowrap;
+        }
+        .sagar-extra-link:hover {
+            background: #eef2ff;
+        }
+        .sagar-extra-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .sagar-extra-logout {
+            padding: 7px 11px;
+            border: 1px solid #000080;
+            border-radius: 7px;
+            background: white;
+            color: #000080;
+            font:
+                    700 12px "Segoe UI",
+                    Arial,
+                    sans-serif;
+            cursor: pointer;
+        }
+        @media (max-width: 720px) {
+            .sagar-extra-nav {
+                gap: 5px;
+            }
+            .sagar-extra-link,
+            .sagar-extra-logout {
+                font-size: 11px;
+                padding: 6px 8px;
+            }
+        }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+        .sagar-identity .sagar-mark {
+            width: 60px;
+            height: 60px;
+            flex: 0 0 60px;
+            display: block;
+        }
+        .sagar-identity .sagar-wordmark {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .sagar-identity .sagar-name {
+            font:
+                    800 29px/1.08 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            letter-spacing: -0.7px;
+            margin: 0;
+        }
+        .sagar-identity .sagar-name span {
+            color: #ff9933;
+        }
+        .sagar-identity .sagar-subtitle {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            letter-spacing: 0.65px;
+            color: #53698d;
+            margin-top: 2px;
+        }
+        .sagar-identity .sagar-role {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            margin-top: 3px;
+        }
+        @media (max-width: 600px) {
+            .sagar-identity .sagar-mark {
+                width: 45px;
+                height: 45px;
+                flex-basis: 45px;
+            }
+            .sagar-identity .sagar-name {
+                font-size: 23px;
+            }
+            .sagar-identity .sagar-subtitle {
+                font-size: 9px;
+                letter-spacing: 0.1px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+    </style>
+    <style>
+        /* Audit trail typography and responsive table polish */
+        body{font-family:'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.5;color:#1e293b}
+        h1{font-size:clamp(24px,2.5vw,32px);font-weight:800;letter-spacing:-.5px}
+        .muted{font-size:15px;color:#64748b}
+        .card{border:1px solid #e2e8f0;border-radius:13px;box-shadow:0 4px 18px #0f172a0b}
+        label{font-size:12px;letter-spacing:.1px;color:#334155}
+        input,select{font:500 13px 'Segoe UI',Arial,sans-serif;border-radius:8px;padding:11px 12px;background:#fff}
+        input:focus,select:focus{outline:2px solid #93b4f9;outline-offset:1px}
+        button,.button{font:700 13px 'Segoe UI',Arial,sans-serif;border-radius:8px;cursor:pointer}
+        table{font:13px/1.45 'Segoe UI',Arial,sans-serif;min-width:920px}
+        th{padding:13px 12px;font-size:12px;letter-spacing:.15px}
+        td{padding:12px;border-color:#e8edf4}
+        tbody tr:hover{background:#f7faff}
+        .tag{font-size:12px;border-radius:6px;padding:5px 8px}
+        .value{color:#475569}
+    </style>
+</head>
+<body>
+<div class="sagar-sticky-header top">
+    <div class="brand">
+        <span class="sagar-identity"
+        ><span class="sagar-mark"
+        ><svg
+                class="brand-logo-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+        >
+              <circle
+                      cx="12"
+                      cy="12"
+                      r="11"
+                      stroke="#000080"
+                      stroke-width="2"
+                      fill="#FFFFFF"
+              />
+              <circle
+                      cx="12"
+                      cy="13"
+                      r="3.5"
+                      stroke="#000080"
+                      stroke-width="1"
+                      stroke-dasharray="1 1"
+              />
+              <path
+                      d="M6 15V10L12 5L18 10V15H6Z"
+                      stroke="#000080"
+                      stroke-width="1.5"
+                      fill="none"
+              />
+              <path
+                      d="M5 18C10 21 14 21 19 18"
+                      stroke="#138808"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+              />
+              <path
+                      d="M12 2V5"
+                      stroke="#FF9933"
+                      stroke-width="2"
+                      stroke-linecap="round"
+              /></svg></span
+        ><span class="sagar-wordmark"
+        ><span class="sagar-name">SAGAR<span>.</span></span
+        ><span class="sagar-subtitle"
+        >SUBSIDY &amp; GRANT ADMINISTRATION</span
+        ><span class="sagar-role">Audit Trail</span></span
+        ></span
+        >
+    </div>
+    <div class="top-links">
+        <a class="sagar-extra-link" th:href="@{/admin/officers}">Officers</a
+        ><a class="sagar-extra-link" th:href="@{/eligibility/admin/monitor}"
+    >Monitoring</a
+    >
+        <a th:href="@{/admin/dashboard}">Admin Dashboard</a>
+        <form
+                th:action="@{/logout}"
+                method="post"
+                style="display: inline; margin: 0"
+        >
+            <input
+                    type="hidden"
+                    th:name="${_csrf.parameterName}"
+                    th:value="${_csrf.token}"
+            /><button
+                type="submit"
+                style="
+              background: none;
+              border: 0;
+              padding: 0;
+              margin-left: 18px;
+              color: #07178f;
+              font: inherit;
+              font-weight: 700;
+              cursor: pointer;
+            "
+        >
+            Logout
+        </button>
+        </form>
+    </div>
+</div>
+<div class="wrap">
+    <h1>Enterprise Audit Trail</h1>
+    <p class="muted">
+        Review security, verification, approval and disbursement activity
+        recorded by SAGAR.
+    </p>
+    <div class="card">
+        <form method="get" th:action="@{/admin/audit}">
+            <div class="filters">
+                <div>
+                    <label>Actor email</label
+                    ><input
+                        name="actor"
+                        th:value="${actor}"
+                        placeholder="user@example.com"
+                />
+                </div>
+                <div>
+                    <label>Role</label
+                    ><select name="role">
+                    <option value="">All roles</option>
+                    <option
+                            value="ROLE_FIELD_OFFICER"
+                            th:selected="${role=='ROLE_FIELD_OFFICER'}"
+                    >
+                        Field Officer
+                    </option>
+                    <option
+                            value="ROLE_DISTRICT_OFFICER"
+                            th:selected="${role=='ROLE_DISTRICT_OFFICER'}"
+                    >
+                        District Officer
+                    </option>
+                    <option
+                            value="ROLE_FINANCE_APPROVER"
+                            th:selected="${role=='ROLE_FINANCE_APPROVER'}"
+                    >
+                        Finance Approver
+                    </option>
+                    <option
+                            value="ROLE_DISBURSEMENT_OFFICER"
+                            th:selected="${role=='ROLE_DISBURSEMENT_OFFICER'}"
+                    >
+                        Disbursement Officer
+                    </option>
+                    <option value="ROLE_ADMIN" th:selected="${role=='ROLE_ADMIN'}">
+                        Admin
+                    </option>
+                </select>
+                </div>
+                <div>
+                    <label>Action contains</label
+                    ><input
+                        name="action"
+                        th:value="${action}"
+                        placeholder="APPROVE, OTP..."
+                />
+                </div>
+                <div>
+                    <label>Entity type</label
+                    ><input
+                        name="entityType"
+                        th:value="${entityType}"
+                        placeholder="SUBSIDY_APPLICATION"
+                />
+                </div>
+                <div>
+                    <label>Entity ID</label
+                    ><input
+                        type="number"
+                        min="1"
+                        name="entityId"
+                        th:value="${entityId}"
+                />
+                </div>
+                <div>
+                    <label>From date</label
+                    ><input type="date" name="fromDate" th:value="${fromDate}" />
+                </div>
+                <div>
+                    <label>To date</label
+                    ><input type="date" name="toDate" th:value="${toDate}" />
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit">Apply Filters</button
+                ><a class="button" th:href="@{/admin/audit}">Clear</a>
+            </div>
+        </form>
+    </div>
+    <div class="card table-wrap">
+        <table th:if="${!logs.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Date / Time</th>
+                <th>Actor</th>
+                <th>Role</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>Previous</th>
+                <th>New</th>
+                <th>Remarks</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="log:${logs}">
+                <td
+                        th:text="${#temporals.format(log.createdAt,'dd MMM yyyy HH:mm:ss')}"
+                ></td>
+                <td th:text="${log.actorEmail}"></td>
+                <td th:text="${log.actorRole}"></td>
+                <td><span class="tag" th:text="${log.action}"></span></td>
+                <td>
+                    <span th:text="${log.entityType}"></span><br /><small
+                        th:if="${log.entityId!=null}"
+                        th:text="${'#'+log.entityId}"
+                ></small>
+                </td>
+                <td class="value" th:text="${log.previousValue}"></td>
+                <td class="value" th:text="${log.newValue}"></td>
+                <td class="value" th:text="${log.remarks}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="empty" th:if="${logs.isEmpty()}">
+            No audit records match the selected filters.
+        </div>
+        <div class="pager" th:if="${auditPage.totalPages>1}">
+            <a
+                    th:if="${auditPage.hasPrevious()}"
+                    th:href="@{/admin/audit(page=${auditPage.number-1},actor=${actor},role=${role},action=${action},entityType=${entityType},entityId=${entityId},fromDate=${fromDate},toDate=${toDate})}"
+            >← Previous</a
+            ><span th:unless="${auditPage.hasPrevious()}"></span>
+            <span
+                    th:text="${'Page '+(auditPage.number+1)+' of '+auditPage.totalPages+' • '+auditPage.totalElements+' records'}"
+            ></span>
+            <a
+                    th:if="${auditPage.hasNext()}"
+                    th:href="@{/admin/audit(page=${auditPage.number+1},actor=${actor},role=${role},action=${action},entityType=${entityType},entityId=${entityId},fromDate=${fromDate},toDate=${toDate})}"
+            >Next →</a
+            >
+        </div>
+    </div>
+</div>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

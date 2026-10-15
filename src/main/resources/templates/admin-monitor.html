@@ -1,0 +1,702 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAGAR - Admin Monitor</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Segoe UI", system-ui, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            color: #1e293b;
+        }
+
+        .site-header {
+            background: #fff;
+            padding: 14px 40px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #e67e22;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .brand h1 {
+            margin: 0;
+            font-size: 22px;
+            color: #000080;
+            font-weight: 800;
+        }
+        .brand h1 span {
+            color: #e67e22;
+        }
+        .brand p {
+            margin: 2px 0 0;
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .nav-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .logout-btn {
+            cursor: pointer;
+            padding: 6px 18px;
+            background: transparent;
+            border: 1.5px solid #000080;
+            color: #000080;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .logout-btn:hover {
+            background: #000080;
+            color: #fff;
+        }
+
+        main {
+            max-width: 1280px;
+            margin: 36px auto;
+            padding: 0 20px;
+        }
+
+        .admin-banner {
+            background: linear-gradient(135deg, #000080, #001aaa);
+            padding: 24px 32px;
+            border-radius: 12px;
+            margin-bottom: 28px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .admin-banner h2 {
+            margin: 0 0 4px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+        .admin-banner p {
+            margin: 0;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Stats row */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border-top: 3px solid #e2e8f0;
+        }
+        .stat-card.field {
+            border-top-color: #0ea5e9;
+        }
+        .stat-card.district {
+            border-top-color: #8b5cf6;
+        }
+        .stat-card.finance {
+            border-top-color: #10b981;
+        }
+        .stat-card.disburse {
+            border-top-color: #f59e0b;
+        }
+        .stat-card.approved {
+            border-top-color: #22c55e;
+        }
+        .stat-card.rejected {
+            border-top-color: #ef4444;
+        }
+        .stat-card.cooling {
+            border-top-color: #fcd34d;
+        }
+        .stat-card.total {
+            border-top-color: #000080;
+        }
+        .stat-num {
+            font-size: 28px;
+            font-weight: 800;
+            color: #000080;
+        }
+        .stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 4px;
+        }
+
+        /* All applications table */
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .table-card h3 {
+            margin: 0 0 20px;
+            color: #000080;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .app-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .app-table thead tr {
+            background: #f8fafc;
+        }
+        .app-table thead th {
+            padding: 10px 12px;
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            text-align: left;
+        }
+        .app-table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.1s;
+        }
+        .app-table tbody tr:hover {
+            background: #f8fafc;
+        }
+        .app-table tbody td {
+            padding: 12px;
+            vertical-align: middle;
+        }
+
+        .app-id {
+            font-weight: 800;
+            color: #000080;
+        }
+        .scheme-badge {
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .score-val {
+            font-weight: 700;
+            color: #e67e22;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .pill-field {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+        .pill-district {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+        .pill-finance {
+            background: #f5f3ff;
+            color: #6d28d9;
+        }
+        .pill-disburse {
+            background: #f0fdf4;
+            color: #065f46;
+        }
+        .pill-approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .pill-rejected {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        .pill-cooling {
+            background: #fef3c7;
+            color: #856404;
+        }
+        .pill-resub {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .utr-val {
+            font-size: 11px;
+            font-weight: 700;
+            color: #065f46;
+        }
+        .empty-state {
+            padding: 36px;
+            text-align: center;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 13px;
+        }
+    </style>
+    <style>
+        /* SAGAR header navigation additions — scoped to avoid changing page layouts */
+        .sagar-extra-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 11px;
+            border: 1px solid #dbe3ef;
+            border-radius: 7px;
+            background: #fff;
+            color: #000080 !important;
+            text-decoration: none;
+            font:
+                    700 12px "Segoe UI",
+                    Arial,
+                    sans-serif;
+            white-space: nowrap;
+        }
+        .sagar-extra-link:hover {
+            background: #eef2ff;
+        }
+        .sagar-extra-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .sagar-extra-logout {
+            padding: 7px 11px;
+            border: 1px solid #000080;
+            border-radius: 7px;
+            background: white;
+            color: #000080;
+            font:
+                    700 12px "Segoe UI",
+                    Arial,
+                    sans-serif;
+            cursor: pointer;
+        }
+        @media (max-width: 720px) {
+            .sagar-extra-nav {
+                gap: 5px;
+            }
+            .sagar-extra-link,
+            .sagar-extra-logout {
+                font-size: 11px;
+                padding: 6px 8px;
+            }
+        }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+        .sagar-identity .sagar-mark {
+            width: 60px;
+            height: 60px;
+            flex: 0 0 60px;
+            display: block;
+        }
+        .sagar-identity .sagar-wordmark {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .sagar-identity .sagar-name {
+            font:
+                    800 29px/1.08 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            letter-spacing: -0.7px;
+            margin: 0;
+        }
+        .sagar-identity .sagar-name span {
+            color: #ff9933;
+        }
+        .sagar-identity .sagar-subtitle {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            letter-spacing: 0.65px;
+            color: #53698d;
+            margin-top: 2px;
+        }
+        .sagar-identity .sagar-role {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            margin-top: 3px;
+        }
+        @media (max-width: 600px) {
+            .sagar-identity .sagar-mark {
+                width: 45px;
+                height: 45px;
+                flex-basis: 45px;
+            }
+            .sagar-identity .sagar-name {
+                font-size: 23px;
+            }
+            .sagar-identity .sagar-subtitle {
+                font-size: 9px;
+                letter-spacing: 0.1px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="sagar-sticky-header site-header">
+    <div class="brand">
+        <span class="sagar-identity"
+        ><span class="sagar-mark"
+        ><svg
+                class="brand-logo-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+        >
+              <circle
+                      cx="12"
+                      cy="12"
+                      r="11"
+                      stroke="#000080"
+                      stroke-width="2"
+                      fill="#FFFFFF"
+              />
+              <circle
+                      cx="12"
+                      cy="13"
+                      r="3.5"
+                      stroke="#000080"
+                      stroke-width="1"
+                      stroke-dasharray="1 1"
+              />
+              <path
+                      d="M6 15V10L12 5L18 10V15H6Z"
+                      stroke="#000080"
+                      stroke-width="1.5"
+                      fill="none"
+              />
+              <path
+                      d="M5 18C10 21 14 21 19 18"
+                      stroke="#138808"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+              />
+              <path
+                      d="M12 2V5"
+                      stroke="#FF9933"
+                      stroke-width="2"
+                      stroke-linecap="round"
+              /></svg></span
+        ><span class="sagar-wordmark"
+        ><span class="sagar-name">SAGAR<span>.</span></span
+        ><span class="sagar-subtitle"
+        >SUBSIDY &amp; GRANT ADMINISTRATION</span
+        ><span class="sagar-role">System Monitoring</span></span
+        ></span
+        >
+    </div>
+    <div class="nav-right">
+        <a class="sagar-extra-link" th:href="@{/admin/dashboard}"
+        >Admin Dashboard</a
+        ><a class="sagar-extra-link" th:href="@{/admin/officers}">Officers</a
+    ><a class="sagar-extra-link" th:href="@{/admin/audit}">Audit Logs</a>
+        <a
+                href="/dashboard"
+                style="
+            font-size: 13px;
+            font-weight: 700;
+            color: #000080;
+            text-decoration: none;
+          "
+        >← Back</a
+        >
+        <form th:action="@{/logout}" method="post" style="display: inline">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </div>
+</header>
+
+<main>
+    <div class="admin-banner">
+        <div>
+            <h2>🖥️ System Administrator Monitor</h2>
+            <p>
+                Real-time overview of all applications across every pipeline stage
+            </p>
+        </div>
+        <div
+                style="
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 700;
+          "
+        >
+            Total:
+            <span
+                    style="color: white; font-size: 20px; font-weight: 800"
+                    th:text="${apps != null ? #lists.size(apps) : 0}"
+            >0</span
+            >
+            applications
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card field">
+            <div
+                    class="stat-num"
+                    th:text="${apps != null ? #lists.size(apps.?[applicationStatus.name() == 'FIELD_VERIFICATION']) : 0}"
+            >
+                0
+            </div>
+            <div class="stat-label">Field Verify</div>
+        </div>
+        <div class="stat-card district">
+            <div
+                    class="stat-num"
+                    th:text="${apps != null ? #lists.size(apps.?[applicationStatus.name() == 'DISTRICT_REVIEW']) : 0}"
+            >
+                0
+            </div>
+            <div class="stat-label">District Review</div>
+        </div>
+        <div class="stat-card finance">
+            <div
+                    class="stat-num"
+                    th:text="${apps != null ? #lists.size(apps.?[applicationStatus.name() == 'FINANCE_PENDING']) : 0}"
+            >
+                0
+            </div>
+            <div class="stat-label">Finance</div>
+        </div>
+        <div class="stat-card disburse">
+            <div
+                    class="stat-num"
+                    th:text="${apps != null ? #lists.size(apps.?[applicationStatus.name() == 'FUND_DISBURSEMENT']) : 0}"
+            >
+                0
+            </div>
+            <div class="stat-label">Disbursement</div>
+        </div>
+        <div class="stat-card approved">
+            <div
+                    class="stat-num"
+                    th:text="${apps != null ? #lists.size(apps.?[applicationStatus.name() == 'APPROVED']) : 0}"
+            >
+                0
+            </div>
+            <div class="stat-label">Approved</div>
+        </div>
+        <div class="stat-card rejected">
+            <div
+                    class="stat-num"
+                    th:text="${apps != null ? #lists.size(apps.?[applicationStatus.name() == 'REJECTED']) : 0}"
+            >
+                0
+            </div>
+            <div class="stat-label">Rejected</div>
+        </div>
+        <div class="stat-card cooling">
+            <div
+                    class="stat-num"
+                    th:text="${apps != null ? #lists.size(apps.?[applicationStatus.name() == 'COOLING_PERIOD']) : 0}"
+            >
+                0
+            </div>
+            <div class="stat-label">Cooling Period</div>
+        </div>
+        <div class="stat-card total">
+            <div
+                    class="stat-num"
+                    th:text="${apps != null ? #lists.size(apps) : 0}"
+            >
+                0
+            </div>
+            <div class="stat-label">Total</div>
+        </div>
+    </div>
+
+    <!-- All Applications Table -->
+    <div class="table-card">
+        <h3>📋 All Applications — Full Pipeline View</h3>
+        <table class="app-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Applicant</th>
+                <th>Scheme</th>
+                <th>Score</th>
+                <th>Sanction</th>
+                <th>Status</th>
+                <th>UTR / Details</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="app : ${apps}">
+                <td>
+                    <span class="app-id" th:text="'#SUB-' + ${app.id}"></span>
+                </td>
+                <td>
+                    <div
+                            style="font-weight: 600; font-size: 13px"
+                            th:text="${app.user?.email ?: 'N/A'}"
+                    ></div>
+                    <div
+                            style="font-size: 11px; color: #94a3b8"
+                            th:text="${app.user?.beneficiary?.fullName ?: ''}"
+                    ></div>
+                </td>
+                <td>
+                <span
+                        class="scheme-badge"
+                        th:text="${app.scheme?.schemeName ?: '—'}"
+                ></span>
+                </td>
+                <td>
+                <span
+                        class="score-val"
+                        th:text="${app.eligibilityScore} + '/100'"
+                ></span>
+                </td>
+                <td
+                        style="font-size: 13px; font-weight: 700; color: #000080"
+                        th:text="${app.sanctionAmount > 0 ? '₹' + #numbers.formatInteger(app.sanctionAmount,1,'COMMA') : '—'}"
+                ></td>
+                <td>
+                <span
+                        th:if="${app.applicationStatus?.name() == 'FIELD_VERIFICATION'}"
+                        class="status-pill pill-field"
+                >🔍 Field</span
+                >
+                    <span
+                            th:if="${app.applicationStatus?.name() == 'RESUBMITTED'}"
+                            class="status-pill pill-resub"
+                    >📨 Resubmitted</span
+                    >
+                    <span
+                            th:if="${app.applicationStatus?.name() == 'DISTRICT_REVIEW'}"
+                            class="status-pill pill-district"
+                    >🏛️ District</span
+                    >
+                    <span
+                            th:if="${app.applicationStatus?.name() == 'FINANCE_PENDING'}"
+                            class="status-pill pill-finance"
+                    >💰 Finance</span
+                    >
+                    <span
+                            th:if="${app.applicationStatus?.name() == 'FUND_DISBURSEMENT'}"
+                            class="status-pill pill-disburse"
+                    >🏦 Disbursal</span
+                    >
+                    <span
+                            th:if="${app.applicationStatus?.name() == 'APPROVED'}"
+                            class="status-pill pill-approved"
+                    >✅ Approved</span
+                    >
+                    <span
+                            th:if="${app.applicationStatus?.name() == 'COOLING_PERIOD'}"
+                            class="status-pill pill-cooling"
+                    >⏳ Cooling</span
+                    >
+                    <span
+                            th:if="${app.applicationStatus?.name() == 'REJECTED'}"
+                            class="status-pill pill-rejected"
+                    >✗ Rejected</span
+                    >
+                </td>
+                <td>
+                <span
+                        class="utr-val"
+                        th:if="${app.utrNumber != null}"
+                        th:text="'UTR: ' + ${app.utrNumber}"
+                >—</span
+                >
+                    <span
+                            style="font-size: 11px; color: #856404"
+                            th:if="${app.coolingPeriodEndDate != null and app.applicationStatus?.name() == 'COOLING_PERIOD'}"
+                            th:text="'Until: ' + ${#temporals.format(app.coolingPeriodEndDate,'dd MMM yyyy')}"
+                    >—</span
+                    >
+                    <span
+                            style="font-size: 11px; color: #94a3b8"
+                            th:if="${app.utrNumber == null and app.coolingPeriodEndDate == null}"
+                    >—</span
+                    >
+                </td>
+                <td
+                        style="font-size: 11px; color: #94a3b8"
+                        th:text="${#temporals.format(app.applicationDate,'dd MMM yy')}"
+                >
+                    —
+                </td>
+            </tr>
+            <tr th:if="${apps == null or #lists.isEmpty(apps)}">
+                <td colspan="8" class="empty-state">
+                    📭 No applications found in the system yet.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

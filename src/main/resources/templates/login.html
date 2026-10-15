@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SAGAR - Citizen/Officer Login Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <style>
+        .split-canvas {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            max-width: 1200px;
+            margin: 60px auto;
+            gap: 50px;
+            padding: 0 20px;
+            align-items: center;
+        }
+        @media (max-width: 992px) {
+            .split-canvas {
+                grid-template-columns: 1fr;
+            }
+            .marketing-banner {
+                display: none;
+            }
+        }
+
+        /* Left Hand Marketing Section */
+        .marketing-banner {
+            position: relative;
+            background:
+                    linear-gradient(rgba(0, 0, 128, 0.1), rgba(255, 153, 51, 0.15)),
+                    url("/images/auth-student.webp") center 35%/cover no-repeat;
+            height: 480px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .traditional-badge {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+        }
+        .traditional-badge h3 {
+            margin: 0;
+            color: #ff9933;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .traditional-badge p {
+            margin: 5px 0 0 0;
+            color: #000080;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Right Hand Login Card Form */
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border-top: 4px solid var(--sagar-navy);
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #444;
+        }
+        .form-group input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .form-group input:focus {
+            border-color: var(--sagar-navy);
+            box-shadow: 0 0 0 3px rgba(0, 0, 128, 0.1);
+        }
+        .submit-action-btn {
+            width: 100%;
+            background: var(--sagar-navy);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .submit-action-btn:hover {
+            background: var(--sagar-navy-dark);
+        }
+
+        /* Reference photo + form presentation; preserve authentication fields */
+        body {
+            background-image:
+                    linear-gradient(90deg, rgba(3, 20, 60, 0.2), rgba(3, 20, 60, 0.1)),
+                    none !important;
+            background-position: center !important;
+            background-size: cover !important;
+            background-attachment: fixed !important;
+        }
+        .auth-container,
+        .login-container,
+        .register-container,
+        .otp-container,
+        .form-container {
+            box-shadow: 0 18px 55px rgba(7, 24, 67, 0.22);
+            border-radius: 14px;
+        }
+        @media (max-width: 700px) {
+            body {
+                background-attachment: scroll !important;
+                background-position: center !important;
+            }
+        }
+
+        /* SAGAR visual repair: single photo panel, no duplicate blank/photo background. */
+        body {background:#f2f6fc !important;}
+        .split-canvas {max-width:1320px;grid-template-columns:minmax(0,1.08fr) minmax(380px,.92fr);gap:28px;margin:36px auto 48px;align-items:stretch;}
+        .marketing-banner {height:auto;min-height:560px;background-image:linear-gradient(0deg,rgba(4,24,62,.58),transparent 52%),url('/images/auth-student.webp') !important;background-size:cover !important;background-position:center 30% !important;border-radius:16px;box-shadow:0 12px 32px rgba(18,43,81,.12);}
+        .traditional-badge {background:transparent;box-shadow:none;backdrop-filter:none;left:28px;right:20px;bottom:25px;padding:0;color:white;}
+        .traditional-badge h3,.traditional-badge p,.traditional-badge div {color:white !important;text-shadow:0 1px 6px rgba(0,0,0,.5);}
+        .form-card {align-self:center;padding:clamp(24px,3vw,46px);box-shadow:0 12px 34px rgba(17,42,83,.09);}
+        @media(max-width:850px){.split-canvas{grid-template-columns:1fr;max-width:600px;margin:24px auto}.marketing-banner{display:block;min-height:220px;background-position:center 36% !important}.traditional-badge{bottom:15px}.traditional-badge h3{font-size:19px}}
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}"/>
+    <style>
+        /* Keep the SAGAR header visible while the page scrolls. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+    </style>
+    <style id="sagar-auth-background-fix">
+        /* Full-page photograph; no side grid or promotional card. */
+        html {min-height:100%;}
+        body {min-height:100vh; background:linear-gradient(90deg,rgba(5,23,60,.24),rgba(5,23,60,.10)),url('/images/auth-student.webp') center center / cover fixed no-repeat !important;}
+        .split-canvas {display:flex !important; justify-content:flex-end !important; align-items:flex-start !important; width:min(100% - 40px,1320px) !important; max-width:1320px !important; min-height:calc(100vh - 180px); margin:32px auto 48px !important; padding:0 !important; gap:0 !important;}
+        .marketing-banner {display:none !important;}
+        .form-card {width:min(100%,540px) !important; max-width:100% !important; margin:0 !important; flex:0 1 auto; background:#fff !important; border-radius:14px !important; box-shadow:0 20px 60px rgba(5,23,60,.25) !important;}
+        @media(max-width:760px) {
+            body {background-attachment:scroll !important; background-position:38% center !important;}
+            .split-canvas {width:calc(100% - 24px) !important; justify-content:center !important; margin:20px auto 32px !important; min-height:calc(100vh - 130px);}
+            .form-card {width:100% !important;}
+        }
+    </style></head>
+<body>
+<div style="
+        max-width: 520px;
+        margin: 14px auto 0;
+        padding: 11px 14px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 8px;
+        color: #166534;
+        font:
+          700 12px Segoe UI,
+          Arial;
+      " th:if="${registrationSuccess}" th:text="${registrationSuccess}"></div>
+<!-- 🧭 Universal Navigation Header -->
+<div class="sagar-sticky-header universal-header">
+    <a class="brand-block" href="/">
+        <!-- FIX: Embedded matching SAGAR Vector Emblem Layout -->
+        <svg class="brand-logo-svg" fill="none" viewbox="0 0 24 24" xmlns="http://w3.org">
+            <circle cx="12" cy="12" fill="#FFFFFF" r="11" stroke="#000080" stroke-width="2"></circle>
+            <circle cx="12" cy="13" r="3.5" stroke="#000080" stroke-dasharray="1 1" stroke-width="1"></circle>
+            <path d="M6 15V10L12 5L18 10V15H6Z" fill="none" stroke="#000080" stroke-width="1.5"></path>
+            <path d="M5 18C10 21 14 21 19 18" stroke="#138808" stroke-linecap="round" stroke-width="2.5"></path>
+            <path d="M12 2V5" stroke="#FF9933" stroke-linecap="round" stroke-width="2"></path>
+        </svg>
+        <div class="brand-text">
+            <h1>SAGAR<span>.</span></h1>
+            <p>Subsidy &amp; Grant Administration</p>
+        </div>
+    </a>
+    <div class="nav-panel">
+        <a href="/">Home</a>
+        <a href="/#schemes">Schemes</a>
+        <a class="nav-btn btn-solid" href="/register">Register Account</a>
+    </div>
+</div>
+<div class="split-canvas">
+
+    <div class="form-card">
+        <h2 style="margin: 0; color: var(--sagar-navy); font-size: 28px">
+            Login
+        </h2>
+        <!-- FIX: Content aligned dynamically to project specs -->
+        <p style="margin: 5px 0 25px 0; color: #6c757d; font-size: 14px">
+            Sign in to your digital subsidy &amp; grant account.
+        </p>
+        <div style="
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: 500;
+          " th:if="${param.error}">
+            ❌ Error: Invalid email credentials or secure password.
+        </div>
+        <div style="
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: 500;
+          " th:if="${param.success}">
+            ✓ Account successfully registered! Please log in below.
+        </div>
+        <form method="post" th:action="@{/login}" th:if="${otpStage != true}">
+            <div class="form-group">
+                <label>User ID (Registered Email Address)</label>
+                <input name="username" placeholder="name@domain.com" required="" type="email"/>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input name="password" placeholder="••••••••" required="" type="password"/>
+            </div>
+            <div style="text-align: right; margin-top: -10px; margin-bottom: 25px">
+                <a style="
+                font-size: 13px;
+                color: var(--sagar-navy);
+                text-decoration: none;
+                font-weight: 500;
+              " th:href="@{/forgot-password}">Forgot Password?</a>
+            </div>
+            <button class="submit-action-btn" type="submit">
+                Login to Account
+            </button>
+        </form>
+        <div id="otpStage" style="margin-top: 18px" th:if="${otpStage}">
+            <div style="
+              background: #eef2ff;
+              color: #1e3a8a;
+              padding: 12px;
+              border-radius: 7px;
+              margin-bottom: 14px;
+              font-size: 13px;
+            ">
+                Password verified. A 6-digit OTP was sent to
+                <b th:text="${maskedEmail}">email</b>.
+            </div>
+            <div style="
+              background: #fee2e2;
+              color: #991b1b;
+              padding: 12px;
+              border-radius: 7px;
+              margin-bottom: 14px;
+              font-size: 13px;
+            " th:if="${otpError}" th:text="${otpError}"></div>
+            <div style="
+              background: #dcfce7;
+              color: #166534;
+              padding: 12px;
+              border-radius: 7px;
+              margin-bottom: 14px;
+              font-size: 13px;
+            " th:if="${param.resent}">
+                A new OTP has been sent.
+            </div>
+            <div style="
+              background: #fff7ed;
+              color: #9a3412;
+              padding: 10px;
+              border-radius: 7px;
+              margin-bottom: 12px;
+              font-size: 12px;
+            " th:if="${devOtp}">
+                Development OTP: <b th:text="${devOtp}"></b>
+            </div>
+            <form method="post" th:action="@{/verify-otp}">
+                <div class="form-group">
+                    <label>Enter OTP</label><input autocomplete="one-time-code" inputmode="numeric" maxlength="6" name="otp" pattern="[0-9]{6}" required="" type="text"/>
+                </div>
+                <div style="
+                display: flex;
+                justify-content: space-between;
+                font-size: 13px;
+                margin: -5px 0 12px;
+              ">
+                    <span>OTP expires in <b id="otpExpiry">05:00</b></span>
+                </div>
+                <button class="submit-action-btn" type="submit">
+                    Verify &amp; Login
+                </button>
+            </form>
+            <form method="post" style="margin-top: 10px" th:action="@{/resend-otp}">
+                <button class="submit-action-btn" disabled="" id="resendOtpBtn" type="submit">
+                    Resend OTP (01:00)
+                </button>
+            </form>
+        </div>
+        <div style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #555;
+          ">
+            <form method="post" style="display: inline; margin: 0" th:action="@{/cancel-otp}" th:if="${otpStage}">
+                <button style="
+                border: 0;
+                background: transparent;
+                padding: 0;
+                color: var(--sagar-navy);
+                font: inherit;
+                font-weight: bold;
+                cursor: pointer;
+              " type="submit">
+                    ← Back to Login
+                </button>
+            </form>
+            <span aria-hidden="true" th:if="${otpStage}">|</span>
+            <span>Don't have an account?
+            <a href="/register" style="
+                color: var(--sagar-navy);
+                font-weight: bold;
+                text-decoration: none;
+              ">Register here</a></span>
+        </div>
+    </div>
+</div>
+<script th:if="${otpStage}">
+    (function () {
+        let expiry = 300,
+            resend = 60;
+        const e = document.getElementById("otpExpiry"),
+            b = document.getElementById("resendOtpBtn");
+        const tick = () => {
+            if (expiry >= 0) {
+                const m = Math.floor(expiry / 60),
+                    s = expiry % 60;
+                e.textContent =
+                    String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+                expiry--;
+            }
+            if (resend > 0) {
+                b.disabled = true;
+                b.textContent =
+                    "Resend OTP (00:" + String(resend).padStart(2, "0") + ")";
+                resend--;
+            } else {
+                b.disabled = false;
+                b.textContent = "Resend OTP";
+            }
+        };
+        tick();
+        setInterval(tick, 1000);
+    })();
+</script>
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

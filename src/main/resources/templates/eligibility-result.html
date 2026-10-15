@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SAGAR - Point Matrix Breakdown Result</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 0; }
+        .breakdown-box { max-width: 950px; margin: 40px auto; background: white; padding: 35px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
+        .breakdown-table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 14px; }
+        .breakdown-table th { background: #E2E8F8; color: #000080; padding: 12px; text-align: left; font-weight: bold; }
+        .breakdown-table td { padding: 12px; border-bottom: 1px solid #E2E8F0; font-weight: 600; }
+        .badge-pass { background-color: rgba(40,167,69,0.1); color: #28a745; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity{display:inline-flex;align-items:center;gap:12px;text-align:left;text-decoration:none;vertical-align:middle;max-width:100%}
+        .sagar-identity .sagar-mark{width:60px;height:60px;flex:0 0 60px;display:block}
+        .sagar-identity .sagar-wordmark{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+        .sagar-identity .sagar-name{font:800 29px/1.08 'Segoe UI',Arial,sans-serif;color:#000080;letter-spacing:-.7px;margin:0}
+        .sagar-identity .sagar-name span{color:#ff9933}
+        .sagar-identity .sagar-subtitle{font:800 11px/1.4 'Segoe UI',Arial,sans-serif;letter-spacing:.65px;color:#53698d;margin-top:2px}
+        .sagar-identity .sagar-role{font:800 11px/1.4 'Segoe UI',Arial,sans-serif;color:#000080;margin-top:3px}
+        @media(max-width:600px){.sagar-identity .sagar-mark{width:45px;height:45px;flex-basis:45px}.sagar-identity .sagar-name{font-size:23px}.sagar-identity .sagar-subtitle{font-size:9px;letter-spacing:.1px}}
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}">
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header { position: sticky !important; top: 0 !important; left: auto !important; right: auto !important; z-index: 1100 !important; }
+        @media (max-width: 900px) { .sagar-sticky-header { flex-wrap: wrap; row-gap: 10px; } }
+    </style>
+</head>
+<body>
+<div class="sagar-sticky-header sagar-auth-header" style="background:white;padding:14px 24px;border-bottom:3px solid #ff9933"><a th:href="@{/dashboard/citizen}" style="text-decoration:none"><span class="sagar-identity"><span class="sagar-mark"><svg class="brand-logo-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="11" stroke="#000080" stroke-width="2" fill="#FFFFFF"/>
+            <circle cx="12" cy="13" r="3.5" stroke="#000080" stroke-width="1" stroke-dasharray="1 1"/>
+            <path d="M6 15V10L12 5L18 10V15H6Z" stroke="#000080" stroke-width="1.5" fill="none"/>
+            <path d="M5 18C10 21 14 21 19 18" stroke="#138808" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M12 2V5" stroke="#FF9933" stroke-width="2" stroke-linecap="round"/>
+        </svg></span><span class="sagar-wordmark"><span class="sagar-name">SAGAR<span>.</span></span><span class="sagar-subtitle">SUBSIDY &amp; GRANT ADMINISTRATION</span><span class="sagar-role">Eligibility Results</span></span></span></a></div>
+
+
+<!-- Inside src/main/resources/templates/eligibility-result.html -->
+<div class="breakdown-box" style="background: white; padding: 35px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); max-width:950px; margin:40px auto;">
+    <h2 style="color: #000080; margin-top: 0; font-weight:800;">📋 Criterion-Wise Evaluation Breakdown Framework</h2>
+    <p style="color:#6c757d; font-size:13px;" th:text="'Target Scheme: ' + ${scheme.schemeName}"></p>
+
+    <table style="width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 14px;">
+        <thead>
+        <tr style="background: #E2E8F8; color: #000080; font-weight: bold; text-align:left;">
+            <th style="padding:12px;">Criterion Name</th>
+            <th style="padding:12px;">Description</th>
+            <th style="padding:12px;">Weight Points</th>
+            <th style="padding:12px;">Check Status</th>
+            <th style="padding:12px;">Points Earned</th>
+        </tr>
+        </thead>
+        <tbody style="font-size:14px; font-weight:600;">
+        <tr style="border-bottom: 1px solid #E2E8F0;">
+            <td style="padding:12px; font-weight:bold;">MIN_AGE</td>
+            <td style="padding:12px; color:#6c757d;">Applicant must be at least 21 years old</td>
+            <td style="padding:12px;">20 pts</td>
+            <td style="padding:12px;"><span style="background:#28a745; color:white; padding:3px 8px; border-radius:4px; font-size:11px;">✓ PASSED</span></td>
+            <td style="padding:12px;" th:text="${agePts} + ' pts'">20 pts</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #E2E8F0;">
+            <td style="padding:12px; font-weight:bold;">MAX_INCOME</td>
+            <td style="padding:12px; color:#6c757d;">Annual income limit ₹6,00,000</td>
+            <td style="padding:12px;">30 pts</td>
+            <td style="padding:12px;"><span style="background:#28a745; color:white; padding:3px 8px; border-radius:4px; font-size:11px;">✓ PASSED</span></td>
+            <td style="padding:12px;" th:text="${incomePts} + ' pts'">30 pts</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #E2E8F0;">
+            <td style="padding:12px; font-weight:bold;">STATE_CHECK</td>
+            <td style="padding:12px; color:#6c757d;">Eligible across all states</td>
+            <td style="padding:12px;">20 pts</td>
+            <td style="padding:12px;"><span style="background:#28a745; color:white; padding:3px 8px; border-radius:4px; font-size:11px;">✓ PASSED</span></td>
+            <td style="padding:12px;" th:text="${statePts} + ' pts'">20 pts</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #E2E8F0;">
+            <td style="padding:12px; font-weight:bold;">IDENTITY_VERIFIED</td>
+            <td style="padding:12px; color:#6c757d;">Aadhaar/PAN identity verified</td>
+            <td style="padding:12px;">30 pts</td>
+            <td style="padding:12px;"><span style="background:#28a745; color:white; padding:3px 8px; border-radius:4px; font-size:11px;">✓ PASSED</span></td>
+            30 pts</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 20px; border-radius: 6px; margin-bottom: 30px; font-weight: bold; font-size: 16px;">
+        <span style="color:#334155;">Aggregated Eligibility Pass Score:</span>
+        <span th:text="${aggregatedScore} + '/100'" style="color:#000080; font-size:18px;">100/100</span>
+    </div>
+
+    <!-- Hidden form safely passing checked scorecard variables down to apply method -->
+    <form th:action="@{/apply/{id}(id=${scheme.id})}" method="post">
+        <input type="hidden" name="score" th:value="${aggregatedScore}"/>
+        <input type="hidden" name="state" th:value="${jurisdictionState}"/>
+        <input type="hidden" name="aadhaarName" th:value="${aadhaarName}"/>
+        <input type="hidden" name="bankName" th:value="${bankName}"/>
+
+        <button type="submit" style="background-color: #138808; color: white; border: none; width: 100%; padding: 14px; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 6px;">
+            🚀 APPLY NOW FOR GRANT SANCTION
+        </button>
+    </form>
+</div>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

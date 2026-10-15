@@ -1,0 +1,340 @@
+<!doctype html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAGAR - Secure Login Verification</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <style>
+        .split-canvas {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            max-width: 1200px;
+            margin: 60px auto;
+            gap: 50px;
+            padding: 0 20px;
+            align-items: center;
+        }
+        @media (max-width: 992px) {
+            .split-canvas {
+                grid-template-columns: 1fr;
+            }
+            .marketing-banner {
+                display: none;
+            }
+        }
+
+        /* Left Hand Marketing Section */
+        .marketing-banner {
+            position: relative;
+            background:
+                    linear-gradient(rgba(0, 0, 128, 0.1), rgba(255, 153, 51, 0.15)),
+                    url("/images/auth-otp.webp") center/cover no-repeat;
+            height: 480px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .traditional-badge {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+        }
+        .traditional-badge h3 {
+            margin: 0;
+            color: #ff9933;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .traditional-badge p {
+            margin: 5px 0 0 0;
+            color: #000080;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Right Hand Login Card Form */
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border-top: 4px solid var(--sagar-navy);
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #444;
+        }
+        .form-group input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .form-group input:focus {
+            border-color: var(--sagar-navy);
+            box-shadow: 0 0 0 3px rgba(0, 0, 128, 0.1);
+        }
+        .submit-action-btn {
+            width: 100%;
+            background: var(--sagar-navy);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .submit-action-btn:hover {
+            background: var(--sagar-navy-dark);
+        }
+
+        /* Reference photo + form presentation; preserve authentication fields */
+        body{background-image:linear-gradient(90deg,rgba(3,20,60,.20),rgba(3,20,60,.10)),none!important;background-position:center!important;background-size:cover!important;background-attachment:fixed!important}
+        .auth-container,.login-container,.register-container,.otp-container,.form-container{box-shadow:0 18px 55px rgba(7,24,67,.22);border-radius:14px}
+        @media(max-width:700px){body{background-attachment:scroll!important;background-position:center!important}}
+
+
+        /* OTP page uses one local image panel, not two overlapping backgrounds. */
+        body {background:#f2f6fc!important;}
+        .split-canvas {max-width:1240px;grid-template-columns:minmax(0,1fr) minmax(370px,1fr);gap:28px;margin:36px auto 48px;align-items:stretch;}
+        .marketing-banner {height:auto;min-height:490px;background-image:linear-gradient(0deg,rgba(4,24,62,.60),transparent 55%),url('/images/auth-otp.webp')!important;background-size:cover!important;background-position:center!important;}
+        .traditional-badge {background:transparent;box-shadow:none;backdrop-filter:none;padding:0;left:26px;bottom:22px;}
+        .traditional-badge h3,.traditional-badge p,.traditional-badge div {color:white!important;text-shadow:0 1px 6px rgba(0,0,0,.5);}
+        .form-card {align-self:center;box-shadow:0 12px 34px rgba(17,42,83,.09);}
+        @media(max-width:850px){.split-canvas{grid-template-columns:1fr;max-width:600px;margin:24px auto}.marketing-banner{display:block;min-height:200px}}
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* Keep the SAGAR header visible while the page scrolls. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 🧭 Universal Navigation Header -->
+<div class="sagar-sticky-header universal-header">
+    <a href="/" class="brand-block">
+        <!-- FIX: Embedded matching SAGAR Vector Emblem Layout -->
+        <svg
+                class="brand-logo-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://w3.org"
+        >
+            <circle
+                    cx="12"
+                    cy="12"
+                    r="11"
+                    stroke="#000080"
+                    stroke-width="2"
+                    fill="#FFFFFF"
+            />
+            <circle
+                    cx="12"
+                    cy="13"
+                    r="3.5"
+                    stroke="#000080"
+                    stroke-width="1"
+                    stroke-dasharray="1 1"
+            />
+            <path
+                    d="M6 15V10L12 5L18 10V15H6Z"
+                    stroke="#000080"
+                    stroke-width="1.5"
+                    fill="none"
+            />
+            <path
+                    d="M5 18C10 21 14 21 19 18"
+                    stroke="#138808"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+            />
+            <path
+                    d="M12 2V5"
+                    stroke="#FF9933"
+                    stroke-width="2"
+                    stroke-linecap="round"
+            />
+        </svg>
+        <div class="brand-text">
+            <h1>SAGAR<span>.</span></h1>
+            <p>Subsidy &amp; Grant Administration</p>
+        </div>
+    </a>
+    <div class="nav-panel">
+        <a href="/">Home</a>
+        <a href="/#schemes">Schemes</a>
+        <a href="/register" class="nav-btn btn-solid">Register Account</a>
+    </div>
+</div>
+
+<div class="split-canvas">
+    <div class="marketing-banner">
+        <div class="traditional-badge">
+            <h3>सबका साथ</h3>
+            <p>सबका विकास</p>
+            <div
+                    style="
+              font-size: 12px;
+              color: #555;
+              margin-top: 6px;
+              font-weight: 500;
+            "
+            >
+                सरल प्रक्रिया • पारदर्शी वितरण • सुरक्षित पोर्टल
+            </div>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <h2 style="margin: 0; color: var(--sagar-navy); font-size: 28px">
+            Verify your login
+        </h2>
+        <p style="margin: 5px 0 25px; color: #6c757d; font-size: 14px">
+            Enter the 6-digit OTP sent to
+            <strong th:text="${maskedEmail}">your registered email</strong>. The
+            OTP expires in 5 minutes.
+        </p>
+
+        <div
+                th:if="${error}"
+                style="
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 14px;
+            font-size: 13px;
+          "
+                th:text="${error}"
+        ></div>
+        <div
+                th:if="${param.resent}"
+                style="
+            background: #dcfce7;
+            color: #166534;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 14px;
+            font-size: 13px;
+          "
+        >
+            A new OTP was generated. The previous OTP is no longer valid.
+        </div>
+        <div
+                th:if="${devOtp != null}"
+                style="
+            background: #fff7ed;
+            color: #9a3412;
+            padding: 10px;
+            border-radius: 7px;
+            margin-bottom: 12px;
+            font-size: 12px;
+          "
+        >
+            Development OTP: <b th:text="${devOtp}"></b>
+        </div>
+
+        <form th:action="@{/verify-otp}" method="post">
+            <div class="form-group">
+                <label>Enter OTP</label>
+                <input
+                        type="text"
+                        name="otp"
+                        inputmode="numeric"
+                        pattern="[0-9]{6}"
+                        maxlength="6"
+                        autocomplete="one-time-code"
+                        placeholder="000000"
+                        required
+                />
+            </div>
+            <button type="submit" class="submit-action-btn">
+                Verify &amp; Continue
+            </button>
+        </form>
+        <form th:action="@{/resend-otp}" method="post" style="margin-top: 10px">
+            <button type="submit" class="submit-action-btn">Resend OTP</button>
+        </form>
+        <div
+                style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #555;
+          "
+        >
+            <form
+                    th:action="@{/cancel-otp}"
+                    method="post"
+                    style="display: inline; margin: 0"
+            >
+                <button
+                        type="submit"
+                        style="
+                border: 0;
+                background: transparent;
+                padding: 0;
+                color: var(--sagar-navy);
+                font: inherit;
+                font-weight: bold;
+                cursor: pointer;
+              "
+                >
+                    ← Back to Login
+                </button>
+            </form>
+            <span aria-hidden="true">|</span>
+            <span
+            >Don't have an account?
+            <a
+                    th:href="@{/register}"
+                    style="
+                color: var(--sagar-navy);
+                font-weight: bold;
+                text-decoration: none;
+              "
+            >Register here</a
+            ></span
+            >
+        </div>
+    </div>
+</div>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

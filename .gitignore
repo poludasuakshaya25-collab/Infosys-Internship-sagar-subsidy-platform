@@ -1,0 +1,62 @@
+
+# ========================================
+# SAGAR - Spring Boot Project
+# ========================================
+
+# Maven build output
+target/
+build/
+out/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse / Spring Tool Suite
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# VS Code
+.vscode/
+
+# Local citizen document uploads
+/uploads/
+**/uploads/
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+application-local.properties
+application-prod.properties
+application-secret.properties
+secrets/
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.jks
+
+# Database exports and backups
+*.sql
+*.sql.gz
+*.dump
+*.bak
+
+# Logs and temporary files
+*.log
+logs/
+*.tmp
+*.temp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local backup archives
+springboards.zip

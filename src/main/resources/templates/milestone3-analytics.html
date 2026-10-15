@@ -1,0 +1,1625 @@
+<!doctype html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAGAR - Fund Utilization Analytics</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: #f1f5f9;
+            margin: 0;
+            font-family: "Segoe UI", system-ui, sans-serif;
+            color: #1e293b;
+        }
+        .site-header {
+            background: #fff;
+            padding: 14px 40px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #e67e22;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        .brand h1 {
+            margin: 0;
+            font-size: 22px;
+            color: #000080;
+            font-weight: 800;
+        }
+        .brand h1 span {
+            color: #e67e22;
+        }
+        .brand p {
+            margin: 2px 0 0;
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .nav {
+            display: flex;
+            gap: 10px;
+        }
+        .nav a {
+            font-size: 12px;
+            font-weight: 700;
+            color: #000080;
+            text-decoration: none;
+            padding: 7px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+        .nav a:hover {
+            background: #f8fafc;
+        }
+        main {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 108px 20px 30px;
+        }
+        .head {
+            margin-bottom: 22px;
+        }
+        .head h2 {
+            margin: 0;
+            color: #000080;
+            font-size: 22px;
+            font-weight: 800;
+        }
+        .head p {
+            margin: 5px 0 0;
+            color: #64748b;
+            font-size: 12.5px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .stat {
+            background: #fff;
+            border-radius: 10px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-top: 3px solid #000080;
+        }
+        .stat.orange {
+            border-top-color: #e67e22;
+        }
+        .stat.green {
+            border-top-color: #138808;
+        }
+        .stat.red {
+            border-top-color: #ef4444;
+        }
+        .stat .num {
+            font-size: 25px;
+            font-weight: 800;
+            color: #000080;
+        }
+        .stat .label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 3px;
+        }
+        .util {
+            margin-top: 10px;
+            height: 8px;
+            border-radius: 20px;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+        .util span {
+            display: block;
+            height: 100%;
+            background: #138808;
+        }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 22px 26px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 22px;
+        }
+        .card h3 {
+            margin: 0 0 5px;
+            color: #000080;
+            font-size: 16px;
+            font-weight: 800;
+        }
+        .sub {
+            font-size: 11.5px;
+            color: #64748b;
+            margin: 0 0 17px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th {
+            padding: 10px;
+            background: #f8fafc;
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.4px;
+            text-align: left;
+        }
+        td {
+            padding: 11px 10px;
+            border-bottom: 1px solid #eef2f7;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .strong {
+            font-weight: 800;
+            color: #000080;
+        }
+        .money {
+            font-weight: 700;
+        }
+        .bar-wrap {
+            min-width: 170px;
+        }
+        .bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .bar span {
+            height: 100%;
+            display: block;
+            background: #e67e22;
+        }
+        .note {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            color: #1d4ed8;
+            border-radius: 7px;
+            padding: 10px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 14px;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+        .chart-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 22px 26px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .chart-card h3 {
+            margin: 0 0 5px;
+            color: #000080;
+            font-size: 16px;
+            font-weight: 800;
+        }
+        .chart-card .sub {
+            font-size: 11px;
+            color: #64748b;
+            margin: 0 0 16px;
+        }
+        .chart-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 80px;
+            gap: 9px;
+            align-items: center;
+            margin: 12px 0;
+        }
+        .chart-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #334155;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chart-track {
+            height: 16px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .chart-fill {
+            height: 100%;
+            background: #000080;
+            border-radius: 20px;
+        }
+        .chart-fill.orange {
+            background: #e67e22;
+        }
+        .chart-value {
+            font-size: 10px;
+            font-weight: 900;
+            color: #000080;
+            text-align: right;
+        }
+        @media (max-width: 850px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 800px) {
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .card {
+                overflow-x: auto;
+            }
+            .site-header {
+                padding: 12px 18px;
+            }
+        }
+        @media (max-width: 500px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            .nav a {
+                display: none;
+            }
+        }
+        .fund-chart {
+            background: #fff;
+            border-radius: 10px;
+            padding: 22px 26px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 22px;
+        }
+        .fund-chart h3 {
+            margin: 0;
+            color: #000080;
+        }
+        .fund-bars {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            align-items: end;
+            height: 190px;
+            margin-top: 18px;
+        }
+        .fund-col {
+            text-align: center;
+        }
+        .fund-bar {
+            margin: auto;
+            width: 70%;
+            min-height: 8px;
+            border-radius: 8px 8px 0 0;
+            background: #000080;
+        }
+        .fund-col:nth-child(2) .fund-bar {
+            background: #138808;
+        }
+        .fund-col:nth-child(3) .fund-bar {
+            background: #e67e22;
+        }
+        .fund-value {
+            font-size: 12px;
+            font-weight: 900;
+            margin-top: 7px;
+        }
+        .fund-label {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+        @media (max-width: 650px) {
+            .fund-bars {
+                height: 150px;
+            }
+        }
+        .fund-overview {
+            background: #fff;
+            border-radius: 10px;
+            padding: 22px 26px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 22px;
+        }
+        .fund-overview-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .fund-total {
+            text-align: right;
+        }
+        .fund-total strong {
+            display: block;
+            color: #000080;
+            font-size: 24px;
+        }
+        .fund-total span {
+            font-size: 9px;
+            color: #94a3b8;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .fund-stack {
+            display: flex;
+            height: 36px;
+            border-radius: 9px;
+            overflow: hidden;
+            background: #e2e8f0;
+            margin: 18px 0 13px;
+        }
+        .fund-stack .released {
+            background: #138808;
+        }
+        .fund-stack .pending {
+            background: #e67e22;
+        }
+        .fund-legend {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .fund-metric {
+            padding: 11px 13px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        .fund-metric strong {
+            display: block;
+            font-size: 17px;
+            color: #0f172a;
+        }
+        .fund-metric span {
+            font-size: 9px;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+        @media (max-width: 650px) {
+            .fund-legend {
+                grid-template-columns: 1fr;
+            }
+            .fund-total {
+                text-align: left;
+            }
+        }
+        html,
+        body {
+            max-width: 100%;
+        }
+        body {
+            overflow-x: clip;
+        }
+        .wrap {
+            width: min(1120px, calc(100% - 28px));
+            max-width: 1120px;
+            box-sizing: border-box;
+        }
+        .grid,
+        .chart-grid,
+        .fund-legend {
+            min-width: 0;
+        }
+        .card,
+        .chart,
+        .fund-overview {
+            min-width: 0;
+            box-sizing: border-box;
+        }
+        @media (max-width: 760px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 520px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .top {
+                padding: 12px 14px;
+            }
+        }
+
+        .graph-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 22px;
+        }
+        .graph-toolbar strong {
+            color: #000080;
+            font-size: 13px;
+        }
+        .graph-toolbar span {
+            display: block;
+            color: #64748b;
+            font-size: 10.5px;
+            margin-top: 3px;
+        }
+        .generate-graph-btn {
+            border: 0;
+            border-radius: 7px;
+            background: #000080;
+            color: #fff;
+            padding: 9px 15px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .generate-graph-btn:hover {
+            background: #1111a5;
+        }
+        #generatedGraphs {
+            display: none;
+        }
+        .graphs-visible {
+            display: block !important;
+        }
+        .generated-note {
+            font-size: 10px;
+            color: #64748b;
+            margin: -10px 0 16px;
+        }
+    </style>
+    <style>
+        /* SAGAR header navigation additions — scoped to avoid changing page layouts */
+        .sagar-extra-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 11px;
+            border: 1px solid #dbe3ef;
+            border-radius: 7px;
+            background: #fff;
+            color: #000080 !important;
+            text-decoration: none;
+            font:
+                    700 12px "Segoe UI",
+                    Arial,
+                    sans-serif;
+            white-space: nowrap;
+        }
+        .sagar-extra-link:hover {
+            background: #eef2ff;
+        }
+        .sagar-extra-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .sagar-extra-logout {
+            padding: 7px 11px;
+            border: 1px solid #000080;
+            border-radius: 7px;
+            background: white;
+            color: #000080;
+            font:
+                    700 12px "Segoe UI",
+                    Arial,
+                    sans-serif;
+            cursor: pointer;
+        }
+        @media (max-width: 720px) {
+            .sagar-extra-nav {
+                gap: 5px;
+            }
+            .sagar-extra-link,
+            .sagar-extra-logout {
+                font-size: 11px;
+                padding: 6px 8px;
+            }
+        }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+        .sagar-identity .sagar-mark {
+            width: 60px;
+            height: 60px;
+            flex: 0 0 60px;
+            display: block;
+        }
+        .sagar-identity .sagar-wordmark {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .sagar-identity .sagar-name {
+            font:
+                    800 29px/1.08 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            letter-spacing: -0.7px;
+            margin: 0;
+        }
+        .sagar-identity .sagar-name span {
+            color: #ff9933;
+        }
+        .sagar-identity .sagar-subtitle {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            letter-spacing: 0.65px;
+            color: #53698d;
+            margin-top: 2px;
+        }
+        .sagar-identity .sagar-role {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            margin-top: 3px;
+        }
+        @media (max-width: 600px) {
+            .sagar-identity .sagar-mark {
+                width: 45px;
+                height: 45px;
+                flex-basis: 45px;
+            }
+            .sagar-identity .sagar-name {
+                font-size: 23px;
+            }
+            .sagar-identity .sagar-subtitle {
+                font-size: 9px;
+                letter-spacing: 0.1px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* Keep the analytics header visible while scrolling. */
+        .site-header.sagar-sticky-header {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 1100 !important;
+        }
+        main {
+            padding-top: 120px !important;
+        }
+        @media (max-width: 900px) {
+            .site-header.sagar-sticky-header {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            main {
+                padding-top: 155px !important;
+            }
+        }
+    </style>
+    <style>
+        .sagar-export-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 12px 0 20px;
+        }
+        .sagar-export-actions a {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 16px;
+            border-radius: 10px;
+            background: #000080;
+            color: #fff !important;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            box-shadow: 0 2px 6px #00008022;
+        }
+        .sagar-export-actions a:nth-child(2) {
+            background: #138808;
+        }
+        .sagar-export-actions a:hover {
+            filter: brightness(1.12);
+        }
+    </style>
+    <style>
+        .sagar-visual-suite {
+            display: none;
+            margin: 20px 0 28px;
+        }
+        .sagar-visual-suite.graphs-visible {
+            display: block !important;
+        }
+        .viz-intro {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 15px;
+        }
+        .viz-intro h2 {
+            margin: 0 0 5px;
+            color: #000080;
+            font-size: 20px;
+        }
+        .viz-intro p {
+            margin: 0;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .viz-live {
+            white-space: nowrap;
+            color: #138808;
+            background: #effaf1;
+            padding: 8px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .viz-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+        .viz-panel {
+            background: #fff;
+            border: 1px solid #e1e7f0;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 7px 22px rgba(17, 33, 68, 0.06);
+            min-width: 0;
+        }
+        .viz-panel-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .viz-panel h3 {
+            margin: 0;
+            color: #000080;
+            font-size: 16px;
+        }
+        .viz-panel-top p {
+            font-size: 11px;
+            line-height: 1.6;
+            color: #66758a;
+            margin: 6px 0 0;
+        }
+        .viz-type {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            color: #576b87;
+            background: #f0f4fa;
+            padding: 6px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+        .viz-canvas {
+            position: relative;
+            height: 275px;
+            margin: 16px auto 12px;
+            max-width: 510px;
+        }
+        .viz-wide-canvas {
+            height: 300px;
+            max-width: 100%;
+        }
+        .viz-insight {
+            margin: 12px 0 0;
+            background: #f3f7fc;
+            border-left: 3px solid #ff9933;
+            border-radius: 6px;
+            padding: 12px 14px;
+            color: #334155;
+            font-size: 12px;
+            line-height: 1.7;
+            min-height: 44px;
+        }
+        .viz-method {
+            color: #64748b;
+            font-size: 11px;
+            line-height: 1.7;
+            margin: 14px 2px;
+        }
+        .viz-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            text-align: center;
+            font-size: 13px;
+            height: 100%;
+        }
+        @media (max-width: 850px) {
+            .viz-grid {
+                grid-template-columns: 1fr;
+            }
+            .viz-intro {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+            .viz-canvas {
+                height: 260px;
+            }
+            .viz-wide-canvas {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<header class="sagar-sticky-header site-header">
+    <div class="brand">
+        <span class="sagar-identity"
+        ><span class="sagar-mark"
+        ><svg
+                class="brand-logo-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+        >
+              <circle
+                      cx="12"
+                      cy="12"
+                      r="11"
+                      stroke="#000080"
+                      stroke-width="2"
+                      fill="#FFFFFF"
+              />
+              <circle
+                      cx="12"
+                      cy="13"
+                      r="3.5"
+                      stroke="#000080"
+                      stroke-width="1"
+                      stroke-dasharray="1 1"
+              />
+              <path
+                      d="M6 15V10L12 5L18 10V15H6Z"
+                      stroke="#000080"
+                      stroke-width="1.5"
+                      fill="none"
+              />
+              <path
+                      d="M5 18C10 21 14 21 19 18"
+                      stroke="#138808"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+              />
+              <path
+                      d="M12 2V5"
+                      stroke="#FF9933"
+                      stroke-width="2"
+                      stroke-linecap="round"
+              /></svg></span
+        ><span class="sagar-wordmark"
+        ><span class="sagar-name">SAGAR<span>.</span></span
+        ><span class="sagar-subtitle"
+        >SUBSIDY &amp; GRANT ADMINISTRATION</span
+        ><span class="sagar-role">Fund Utilization Analytics</span></span
+        ></span
+        >
+    </div>
+    <div class="nav">
+        <form th:action="@{/logout}" method="post" style="margin: 0">
+            <button type="submit" class="sagar-extra-logout">Logout</button>
+        </form>
+        <a th:if="${schemeFiltered}" href="/milestone3/analytics"
+        >📊 Overall Analytics</a
+        >
+        <a th:href="${analyticsBackUrl}" th:text="${'← ' + analyticsBackLabel}"
+        >← Dashboard</a
+        >
+    </div>
+</header>
+
+<main>
+    <div class="sagar-export-actions" aria-label="Analytics report downloads">
+        <a
+                th:href="@{/milestone3/reports/analytics/excel(schemeId=${selectedSchemeId})}"
+        >⬇ Export Analytics Excel</a
+        ><a
+            th:href="@{/milestone3/reports/analytics/pdf(schemeId=${selectedSchemeId})}"
+    >⬇ Export Analytics PDF</a
+    >
+    </div>
+    <div class="head">
+        <h2
+                th:text="${schemeFiltered ? 'Scheme Fund Analytics — ' + selectedSchemeName : 'Fund Utilization & Regional Analytics'}"
+        >
+            Fund Utilization &amp; Regional Analytics
+        </h2>
+        <p
+                th:text="${schemeFiltered ? 'Scheme-specific view across every applicant under ' + selectedSchemeName + ': sanctions, actual releases, pending installments and regional utilization.' : 'Operational view of sanctioned funds, actual staged releases, milestone workload and utilization by scheme and beneficiary region.'}"
+        >
+            Operational analytics.
+        </p>
+        <div
+                th:if="${success}"
+                style="
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 7px;
+            color: #166534;
+            font-size: 11px;
+            font-weight: 700;
+          "
+                th:text="${success}"
+        >
+            Success
+        </div>
+        <div
+                th:if="${error}"
+                style="
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 7px;
+            color: #991b1b;
+            font-size: 11px;
+            font-weight: 700;
+          "
+                th:text="${error}"
+        >
+            Error
+        </div>
+        <form
+                method="post"
+                action="/milestone3/reminders/run"
+                th:if="${financeViewer}"
+                style="margin-top: 12px"
+        >
+            <input
+                    type="hidden"
+                    th:name="${_csrf.parameterName}"
+                    th:value="${_csrf.token}"
+            />
+            <button
+                    type="submit"
+                    style="
+              border: 1px solid #e2e8f0;
+              border-radius: 6px;
+              padding: 8px 12px;
+              background: #fff;
+              color: #000080;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            "
+            >
+                🔔 Run Compliance Reminder Check Now
+            </button>
+        </form>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="num" th:text="${analytics.totalApplications}">0</div>
+            <div class="label">Applications</div>
+        </div>
+        <div class="stat">
+            <div class="num" th:text="${analytics.approvedApplications}">0</div>
+            <div class="label">Completed / Disbursed</div>
+        </div>
+        <div class="stat orange">
+            <div
+                    class="num"
+                    th:text="${'₹' + #numbers.formatDecimal(analytics.totalSanctioned,1,2)}"
+            >
+                ₹0
+            </div>
+            <div class="label">Total Sanctioned</div>
+        </div>
+        <div class="stat green">
+            <div
+                    class="num"
+                    th:text="${'₹' + #numbers.formatDecimal(analytics.totalReleased,1,2)}"
+            >
+                ₹0
+            </div>
+            <div class="label">Actual Released</div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="num" th:text="${analytics.activePlans}">0</div>
+            <div class="label">Active Plans</div>
+        </div>
+        <div class="stat green">
+            <div class="num" th:text="${analytics.completedPlans}">0</div>
+            <div class="label">Completed Plans</div>
+        </div>
+        <div class="stat orange">
+            <div class="num" th:text="${analytics.pendingMilestones}">0</div>
+            <div class="label">Pending Milestones</div>
+        </div>
+        <div class="stat red">
+            <div class="num" th:text="${analytics.overdueMilestones}">0</div>
+            <div class="label">Overdue Milestones</div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <div
+                    class="num"
+                    th:text="${'₹' + #numbers.formatDecimal(analytics.totalAllocatedBudget,1,2)}"
+            >
+                ₹0
+            </div>
+            <div class="label">Configured Scheme Budget</div>
+        </div>
+        <div class="stat orange">
+            <div
+                    class="num"
+                    th:text="${'₹' + #numbers.formatDecimal(analytics.totalRemainingBudget,1,2)}"
+            >
+                ₹0
+            </div>
+            <div class="label">Remaining Scheme Budget</div>
+        </div>
+        <div class="stat green">
+            <div
+                    class="num"
+                    th:text="${#numbers.formatDecimal(analytics.budgetUtilization,1,2)} + '%'"
+            >
+                0%
+            </div>
+            <div class="label">Budget Utilization</div>
+        </div>
+        <div class="stat">
+            <div
+                    class="num"
+                    th:text="${#numbers.formatDecimal(analytics.overallUtilization,1,2)} + '%'"
+            >
+                0%
+            </div>
+            <div class="label">Sanction-to-Release</div>
+        </div>
+    </div>
+
+    <section class="graph-toolbar">
+        <div>
+            <strong>📊 Graphical Representation</strong>
+            <span
+            >Generate charts from the data currently available in SAGAR. The
+            graph reflects the present database state each time this page is
+            loaded.</span
+            >
+        </div>
+        <button
+                id="generateGraphBtn"
+                class="generate-graph-btn"
+                type="button"
+                onclick="toggleAnalyticsGraphs()"
+        >
+            📈 Generate Graph
+        </button>
+    </section>
+
+    <section class="fund-overview">
+        <div class="fund-overview-head">
+            <div>
+                <h3 style="margin: 0; color: #000080">
+                    💹 Sanctioned → Released / Pending
+                </h3>
+                <p class="sub" style="margin-top: 5px">
+                    One financial unit: released plus pending release equals the
+                    sanctioned amount.
+                </p>
+            </div>
+            <div class="fund-total">
+                <strong
+                        th:text="${'₹' + #numbers.formatDecimal(analytics.totalSanctioned,1,2)}"
+                >₹0</strong
+                ><span>Total Sanctioned</span>
+            </div>
+        </div>
+        <div class="fund-stack">
+            <div
+                    class="released"
+                    th:style="|width:${analytics.totalSanctioned > 0 ? (100 * analytics.totalReleased / analytics.totalSanctioned) : 0}%|"
+            ></div>
+            <div
+                    class="pending"
+                    th:style="|width:${analytics.totalSanctioned > 0 ? (100 * analytics.totalPendingRelease / analytics.totalSanctioned) : 0}%|"
+            ></div>
+        </div>
+        <div class="fund-legend">
+            <div class="fund-metric">
+                <strong
+                        th:text="${'₹' + #numbers.formatDecimal(analytics.totalReleased,1,2)}"
+                >₹0</strong
+                ><span>Actually Released</span>
+            </div>
+            <div class="fund-metric">
+                <strong
+                        th:text="${'₹' + #numbers.formatDecimal(analytics.totalPendingRelease,1,2)}"
+                >₹0</strong
+                ><span>Pending Release</span>
+            </div>
+            <div class="fund-metric">
+                <strong
+                        th:text="${#numbers.formatDecimal(analytics.overallUtilization,1,2)} + '%'"
+                >0%</strong
+                ><span>Release Progress</span>
+            </div>
+        </div>
+    </section>
+    <div id="generatedGraphs" class="sagar-visual-suite">
+        <div class="viz-intro">
+            <div>
+                <h2>Financial Performance & Insights</h2>
+                <p>
+                    Interactive analysis of approved funds, releases, scheme
+                    performance and beneficiary regions. All figures reflect the
+                    selected scheme filter.
+                </p>
+            </div>
+            <span class="viz-live">● Database-driven</span>
+        </div>
+        <div class="viz-grid">
+            <article class="viz-panel">
+                <div class="viz-panel-top">
+                    <div>
+                        <h3>Fund Utilization</h3>
+                        <p>How much of the sanctioned budget has been released?</p>
+                    </div>
+                    <span class="viz-type">DOUGHNUT</span>
+                </div>
+                <div class="viz-canvas">
+                    <canvas
+                            id="sagarBudgetChart"
+                            aria-label="Donut chart of released and pending funds"
+                            role="img"
+                    ></canvas>
+                </div>
+                <p class="viz-insight" id="budgetInsight">
+                    Loading budget analysis…
+                </p>
+            </article>
+            <article class="viz-panel">
+                <div class="viz-panel-top">
+                    <div>
+                        <h3>Scheme-wise Fund Allocation</h3>
+                        <p>Which schemes account for the largest sanctioned amounts?</p>
+                    </div>
+                    <span class="viz-type">PIE</span>
+                </div>
+                <div class="viz-canvas">
+                    <canvas
+                            id="sagarSchemePie"
+                            aria-label="Pie chart of sanctioned funds by scheme"
+                            role="img"
+                    ></canvas>
+                </div>
+                <p class="viz-insight" id="schemePieInsight">
+                    Loading scheme analysis…
+                </p>
+            </article>
+            <article class="viz-panel">
+                <div class="viz-panel-top">
+                    <div>
+                        <h3>Sanctioned vs Released by Scheme</h3>
+                        <p>Compare approved funding with actual releases, in rupees.</p>
+                    </div>
+                    <span class="viz-type">GROUPED BAR</span>
+                </div>
+                <div class="viz-canvas viz-wide-canvas">
+                    <canvas
+                            id="sagarSchemeBar"
+                            aria-label="Grouped bar chart of sanctioned and released amounts by scheme"
+                            role="img"
+                    ></canvas>
+                </div>
+                <p class="viz-insight" id="schemeBarInsight">
+                    Loading scheme comparison…
+                </p>
+            </article>
+            <article class="viz-panel">
+                <div class="viz-panel-top">
+                    <div>
+                        <h3>Regional Disbursement Performance</h3>
+                        <p>
+                            Understand funding distribution and release progress across
+                            regions.
+                        </p>
+                    </div>
+                    <span class="viz-type">HORIZONTAL BAR</span>
+                </div>
+                <div class="viz-canvas viz-wide-canvas">
+                    <canvas
+                            id="sagarRegionBar"
+                            aria-label="Horizontal grouped bar chart of funds by region"
+                            role="img"
+                    ></canvas>
+                </div>
+                <p class="viz-insight" id="regionInsight">
+                    Loading regional analysis…
+                </p>
+            </article>
+        </div>
+        <p class="viz-method">
+            Reading the charts: <b>Sanctioned</b> means approved funding,
+            <b>Released</b> means funds actually disbursed, and <b>Pending</b> is
+            the remaining sanctioned amount awaiting release. Hover over any
+            segment or bar for exact amounts.
+        </p>
+    </div>
+
+    <section class="card">
+        <h3>Scheme-wise Fund Utilization</h3>
+        <p class="sub">
+            Sanctioned amount versus actual released amount across all
+            applications.
+        </p>
+        <table>
+            <thead>
+            <tr>
+                <th>Scheme</th>
+                <th>Applications</th>
+                <th>Allocated Budget</th>
+                <th>Remaining</th>
+                <th>Sanctioned</th>
+                <th>Released</th>
+                <th>Release / Sanction</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="row : ${analytics.schemeSummaries}">
+                <td class="strong" th:text="${row.name}">Scheme</td>
+                <td th:text="${row.applications}">0</td>
+                <td
+                        class="money"
+                        th:text="${'₹' + #numbers.formatDecimal(row.allocatedBudget,1,2)}"
+                >
+                    ₹0
+                </td>
+                <td
+                        class="money"
+                        th:text="${'₹' + #numbers.formatDecimal(row.remainingBudget,1,2)}"
+                >
+                    ₹0
+                </td>
+                <td
+                        class="money"
+                        th:text="${'₹' + #numbers.formatDecimal(row.sanctioned,1,2)}"
+                >
+                    ₹0
+                </td>
+                <td
+                        class="money"
+                        th:text="${'₹' + #numbers.formatDecimal(row.released,1,2)}"
+                >
+                    ₹0
+                </td>
+                <td class="bar-wrap">
+                    <div
+                            style="font-size: 11px; font-weight: 800; margin-bottom: 4px"
+                            th:text="${#numbers.formatDecimal(row.utilization,1,2)} + '%'"
+                    >
+                        0%
+                    </div>
+                    <div class="bar">
+                  <span
+                          th:style="'width:' + ${row.utilization > 100 ? 100 : row.utilization} + '%'"
+                  ></span>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(analytics.schemeSummaries)}">
+                <td
+                        colspan="7"
+                        style="text-align: center; color: #94a3b8; padding: 30px"
+                >
+                    No scheme disbursement data available.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="card">
+        <h3>Region-wise Fund Utilization</h3>
+        <p class="sub">
+            Regional grouping uses the beneficiary State captured in the existing
+            beneficiary profile.
+        </p>
+        <table>
+            <thead>
+            <tr>
+                <th>Region / State</th>
+                <th>Applications</th>
+                <th>Sanctioned</th>
+                <th>Released</th>
+                <th>Utilization</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="row : ${analytics.regionSummaries}">
+                <td class="strong" th:text="${row.name}">State</td>
+                <td th:text="${row.applications}">0</td>
+                <td
+                        class="money"
+                        th:text="${'₹' + #numbers.formatDecimal(row.sanctioned,1,2)}"
+                >
+                    ₹0
+                </td>
+                <td
+                        class="money"
+                        th:text="${'₹' + #numbers.formatDecimal(row.released,1,2)}"
+                >
+                    ₹0
+                </td>
+                <td class="bar-wrap">
+                    <div
+                            style="font-size: 11px; font-weight: 800; margin-bottom: 4px"
+                            th:text="${#numbers.formatDecimal(row.utilization,1,2)} + '%'"
+                    >
+                        0%
+                    </div>
+                    <div class="bar">
+                  <span
+                          th:style="'width:' + ${row.utilization > 100 ? 100 : row.utilization} + '%'"
+                  ></span>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(analytics.regionSummaries)}">
+                <td
+                        colspan="5"
+                        style="text-align: center; color: #94a3b8; padding: 30px"
+                >
+                    No regional data available.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="note">
+            ℹ️ Actual released funds are calculated from staged milestone
+            releases. Existing legacy applications already marked as disbursed are
+            included using their recorded sanction amount. Scheme budget remaining
+            is maintained from Finance sanction reservations.
+        </div>
+    </section>
+</main>
+
+<script
+        src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"
+        defer
+></script>
+<script th:inline="javascript">
+    const sagarVizData = {
+        sanctioned: /*[[${analytics.totalSanctioned}]]*/ 0,
+        released: /*[[${analytics.totalReleased}]]*/ 0,
+        pending: /*[[${analytics.totalPendingRelease}]]*/ 0,
+        schemes: /*[[${analytics.schemeSummaries}]]*/ [],
+        regions: /*[[${analytics.regionSummaries}]]*/ [],
+    };
+    let sagarVizRendered = false;
+    function toggleAnalyticsGraphs() {
+        const graphs = document.getElementById("generatedGraphs");
+        const btn = document.getElementById("generateGraphBtn");
+        const shown = graphs.classList.toggle("graphs-visible");
+        btn.textContent = shown
+            ? "✕ Hide Graphs"
+            : "📊 Explore Visual Analytics";
+        if (shown) {
+            if (!sagarVizRendered) renderSagarVisuals();
+            graphs.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }
+    function renderSagarVisuals() {
+        if (typeof Chart === "undefined") {
+            document
+                .querySelectorAll(".viz-canvas")
+                .forEach(
+                    (el) =>
+                        (el.innerHTML =
+                            '<div class="viz-empty">Chart library could not load. Check your internet connection and refresh this page.</div>'),
+                );
+            return;
+        }
+        sagarVizRendered = true;
+        const d = sagarVizData;
+        const num = (v) => Math.max(0, Number(v) || 0);
+        const money = (v) =>
+            "₹" + num(v).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+        const percent = (a, b) =>
+            b > 0 ? ((100 * a) / b).toFixed(1) + "%" : "0%";
+        const colors = [
+            "#000080",
+            "#FF9933",
+            "#138808",
+            "#4385c7",
+            "#a05cbb",
+            "#ec6a67",
+            "#17a5a3",
+            "#e5b640",
+            "#718096",
+            "#7c6fd3",
+        ];
+        const opts = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 10,
+                        padding: 14,
+                        font: { size: 11 },
+                    },
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => " " + ctx.label + ": " + money(ctx.parsed),
+                    },
+                },
+            },
+        };
+        const s = Array.isArray(d.schemes) ? d.schemes : [];
+        const r = Array.isArray(d.regions) ? d.regions : [];
+        const read = (row, keys) => {
+            for (const k of keys) {
+                if (row && row[k] !== undefined && row[k] !== null)
+                    return num(row[k]);
+            }
+            return 0;
+        };
+        const rows = (list) =>
+            list.map((row) => ({
+                name: String(row.name || "Unspecified"),
+                sanctioned: read(row, [
+                    "sanctioned",
+                    "totalSanctioned",
+                    "sanctionedAmount",
+                ]),
+                released: read(row, [
+                    "released",
+                    "totalReleased",
+                    "releasedAmount",
+                ]),
+            }));
+        const schemes = rows(s),
+            regions = rows(r);
+        const empty = (id, msg) => {
+            const c = document.getElementById(id);
+            c.parentElement.innerHTML =
+                '<div class="viz-empty">' + msg + "</div>";
+        };
+        if (num(d.sanctioned) > 0) {
+            new Chart(document.getElementById("sagarBudgetChart"), {
+                type: "doughnut",
+                data: {
+                    labels: ["Released", "Pending release"],
+                    datasets: [
+                        {
+                            data: [num(d.released), num(d.pending)],
+                            backgroundColor: ["#138808", "#FF9933"],
+                            borderColor: "#fff",
+                            borderWidth: 4,
+                            hoverOffset: 8,
+                        },
+                    ],
+                },
+                options: {
+                    ...opts,
+                    cutout: "68%",
+                    plugins: {
+                        ...opts.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) =>
+                                    " " +
+                                    ctx.label +
+                                    ": " +
+                                    money(ctx.parsed) +
+                                    " (" +
+                                    percent(ctx.parsed, num(d.sanctioned)) +
+                                    ")",
+                            },
+                        },
+                    },
+                },
+            });
+            document.getElementById("budgetInsight").textContent =
+                percent(num(d.released), num(d.sanctioned)) +
+                " of sanctioned funds have been released (" +
+                money(d.released) +
+                "). " +
+                money(d.pending) +
+                " remains pending release.";
+        } else {
+            empty(
+                "sagarBudgetChart",
+                "No sanctioned funding is available for this selection.",
+            );
+            document.getElementById("budgetInsight").textContent =
+                "Fund utilization will appear once an application has a sanctioned amount.";
+        }
+        const activeSchemes = schemes.filter((x) => x.sanctioned > 0);
+        if (activeSchemes.length) {
+            new Chart(document.getElementById("sagarSchemePie"), {
+                type: "pie",
+                data: {
+                    labels: activeSchemes.map((x) => x.name),
+                    datasets: [
+                        {
+                            data: activeSchemes.map((x) => x.sanctioned),
+                            backgroundColor: activeSchemes.map(
+                                (_, i) => colors[i % colors.length],
+                            ),
+                            borderColor: "#fff",
+                            borderWidth: 3,
+                        },
+                    ],
+                },
+                options: opts,
+            });
+            const top = [...activeSchemes].sort(
+                (a, b) => b.sanctioned - a.sanctioned,
+            )[0];
+            const total = activeSchemes.reduce((a, x) => a + x.sanctioned, 0);
+            document.getElementById("schemePieInsight").textContent =
+                top.name +
+                " has the largest share of sanctioned funding: " +
+                money(top.sanctioned) +
+                " (" +
+                percent(top.sanctioned, total) +
+                " of the scheme total). Each slice represents a scheme’s share, not its release rate.";
+        } else {
+            empty("sagarSchemePie", "No scheme allocation data is available.");
+            document.getElementById("schemePieInsight").textContent =
+                "Scheme allocation will appear when sanctioned amounts are available.";
+        }
+        const barOpts = (horizontal) => ({
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: horizontal ? "y" : "x",
+            scales: {
+                x: { ticks: { font: { size: 10 } }, grid: { color: "#edf1f6" } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { font: { size: 10 } },
+                    grid: { color: "#edf1f6" },
+                },
+            },
+            plugins: {
+                legend: {
+                    position: "top",
+                    labels: { usePointStyle: true, boxWidth: 10 },
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) =>
+                            " " +
+                            ctx.dataset.label +
+                            ": " +
+                            money(horizontal ? ctx.parsed.x : ctx.parsed.y),
+                    },
+                },
+            },
+        });
+        if (schemes.length) {
+            new Chart(document.getElementById("sagarSchemeBar"), {
+                type: "bar",
+                data: {
+                    labels: schemes.map((x) => x.name),
+                    datasets: [
+                        {
+                            label: "Sanctioned",
+                            data: schemes.map((x) => x.sanctioned),
+                            backgroundColor: "#000080",
+                            borderRadius: 5,
+                        },
+                        {
+                            label: "Released",
+                            data: schemes.map((x) => x.released),
+                            backgroundColor: "#138808",
+                            borderRadius: 5,
+                        },
+                    ],
+                },
+                options: barOpts(false),
+            });
+            const top = [...schemes].sort((a, b) => b.released - a.released)[0];
+            document.getElementById("schemeBarInsight").textContent =
+                "Highest actual release: " +
+                top.name +
+                " (" +
+                money(top.released) +
+                "). Compare each green bar against its navy bar to see the amount released relative to the sanction.";
+        } else {
+            empty("sagarSchemeBar", "No scheme comparison data is available.");
+            document.getElementById("schemeBarInsight").textContent =
+                "No scheme records are available for comparison.";
+        }
+        if (regions.length) {
+            new Chart(document.getElementById("sagarRegionBar"), {
+                type: "bar",
+                data: {
+                    labels: regions.map((x) => x.name),
+                    datasets: [
+                        {
+                            label: "Sanctioned",
+                            data: regions.map((x) => x.sanctioned),
+                            backgroundColor: "#000080",
+                            borderRadius: 5,
+                        },
+                        {
+                            label: "Released",
+                            data: regions.map((x) => x.released),
+                            backgroundColor: "#FF9933",
+                            borderRadius: 5,
+                        },
+                    ],
+                },
+                options: barOpts(true),
+            });
+            const top = [...regions].sort((a, b) => b.released - a.released)[0];
+            document.getElementById("regionInsight").textContent =
+                top.name +
+                " has the highest actual regional release (" +
+                money(top.released) +
+                "). Compare saffron and navy bars to identify regions with larger outstanding sanctioned balances.";
+        } else {
+            empty(
+                "sagarRegionBar",
+                "No regional disbursement data is available.",
+            );
+            document.getElementById("regionInsight").textContent =
+                "Regional comparisons will appear when beneficiary region data is available.";
+        }
+    }
+</script>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

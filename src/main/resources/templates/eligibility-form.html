@@ -1,0 +1,596 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAGAR - Apply</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Segoe UI", system-ui, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            color: #1e293b;
+        }
+        .page {
+            max-width: 860px;
+            margin: 32px auto;
+            padding: 0 20px 60px;
+        }
+        .back {
+            display: inline-block;
+            color: #000080;
+            font-weight: 700;
+            text-decoration: none;
+            margin-bottom: 18px;
+        }
+        .score {
+            background: linear-gradient(135deg, #000080, #1b1baa);
+            color: #fff;
+            border-radius: 12px;
+            padding: 22px 26px;
+            margin-bottom: 18px;
+            display: flex;
+            gap: 22px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .num {
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .num small {
+            font-size: 17px;
+            color: #aaa;
+        }
+        .barbox {
+            flex: 1;
+            min-width: 220px;
+        }
+        .bar {
+            height: 9px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 9px;
+            overflow: hidden;
+        }
+        .fill {
+            height: 100%;
+            width: 0;
+            background: #e67e22;
+            transition: width 0.25s;
+        }
+        .hint {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: 8px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+        }
+        h1 {
+            color: #000080;
+            font-size: 22px;
+            margin: 0 0 5px;
+        }
+        .sub {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.55;
+            margin-bottom: 22px;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+        .section {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 800;
+            color: #94a3b8;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin: 24px 0 16px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .full {
+            grid-column: 1/-1;
+        }
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+        .field label,
+        .doc label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+        .field input,
+        .field select {
+            padding: 10px 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: #fff;
+        }
+        .note {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        .docs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .doc {
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            padding: 14px;
+            background: #f8fafc;
+        }
+        .doc.optional {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        .doc input {
+            width: 100%;
+            margin-top: 4px;
+        }
+        .status {
+            font-size: 11px;
+            margin-top: 6px;
+            color: #64748b;
+        }
+        .mandatory {
+            color: #991b1b;
+            font-weight: 800;
+        }
+        .optional-label {
+            color: #166534;
+            font-weight: 800;
+        }
+        .submit {
+            width: 100%;
+            border: 0;
+            background: #000080;
+            color: #fff;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 15px;
+            margin-top: 25px;
+            cursor: pointer;
+        }
+        .submit:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+        .stats {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .stat {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 6px 9px;
+            border-radius: 7px;
+            font-size: 11px;
+        }
+        @media (max-width: 600px) {
+            .grid,
+            .docs {
+                grid-template-columns: 1fr;
+            }
+            .full {
+                grid-column: auto;
+            }
+        }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+        .sagar-identity .sagar-mark {
+            width: 60px;
+            height: 60px;
+            flex: 0 0 60px;
+            display: block;
+        }
+        .sagar-identity .sagar-wordmark {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .sagar-identity .sagar-name {
+            font:
+                    800 29px/1.08 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            letter-spacing: -0.7px;
+            margin: 0;
+        }
+        .sagar-identity .sagar-name span {
+            color: #ff9933;
+        }
+        .sagar-identity .sagar-subtitle {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            letter-spacing: 0.65px;
+            color: #53698d;
+            margin-top: 2px;
+        }
+        .sagar-identity .sagar-role {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            margin-top: 3px;
+        }
+        @media (max-width: 600px) {
+            .sagar-identity .sagar-mark {
+                width: 45px;
+                height: 45px;
+                flex-basis: 45px;
+            }
+            .sagar-identity .sagar-name {
+                font-size: 23px;
+            }
+            .sagar-identity .sagar-subtitle {
+                font-size: 9px;
+                letter-spacing: 0.1px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+        .sagar-header-return { margin-left:auto; padding:10px 16px; border-radius:8px; background:#000080; color:#fff !important; font-weight:700; font-size:13px; text-decoration:none; white-space:nowrap; }
+        .sagar-header-return:hover { background:#1717a0; }
+        @media(max-width:600px) { .sagar-header-return { font-size:12px; padding:8px 10px; } }
+    </style>
+</head>
+<body>
+<div class="sagar-sticky-header universal-header">
+    <a href="/dashboard" class="brand-block"
+    ><span class="sagar-identity"
+    ><span class="sagar-mark"
+    ><svg
+            class="brand-logo-svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+    >
+              <circle
+                      cx="12"
+                      cy="12"
+                      r="11"
+                      stroke="#000080"
+                      stroke-width="2"
+                      fill="#FFFFFF"
+              />
+              <circle
+                      cx="12"
+                      cy="13"
+                      r="3.5"
+                      stroke="#000080"
+                      stroke-width="1"
+                      stroke-dasharray="1 1"
+              />
+              <path
+                      d="M6 15V10L12 5L18 10V15H6Z"
+                      stroke="#000080"
+                      stroke-width="1.5"
+                      fill="none"
+              />
+              <path
+                      d="M5 18C10 21 14 21 19 18"
+                      stroke="#138808"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+              />
+              <path
+                      d="M12 2V5"
+                      stroke="#FF9933"
+                      stroke-width="2"
+                      stroke-linecap="round"
+              /></svg></span
+    ><span class="sagar-wordmark"
+    ><span class="sagar-name">SAGAR<span>.</span></span
+    ><span class="sagar-subtitle"
+    >SUBSIDY &amp; GRANT ADMINISTRATION</span
+    ><span class="sagar-role">Eligibility Assessment</span></span
+    ></span
+    ></a
+    >
+    <a class="sagar-header-return" th:href="@{/dashboard/citizen}">← Return to Dashboard</a>
+</div>
+<div class="page">
+    <div class="score">
+        <div>
+            <div
+                    style="
+              font-size: 11px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              color: #bbb;
+            "
+            >
+                Live eligibility score
+            </div>
+            <div class="num" id="liveScore">0 <small>/100</small></div>
+        </div>
+        <div class="barbox">
+            <div id="scoreMessage">Fill in the form and upload documents.</div>
+            <div class="bar"><div class="fill" id="scoreBar"></div></div>
+            <div class="stats">
+            <span class="stat" id="mandatoryStat">Mandatory docs: 0/0</span
+            ><span class="stat" id="optionalStat">Optional docs: 0/0</span>
+            </div>
+            <div class="hint" id="scoreHint">
+                The score is calculated by the server every time you change a field
+                or upload a document.
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <h1 th:text="${scheme.emoji + ' ' + scheme.schemeName}">Scheme</h1>
+        <p class="sub" th:text="${scheme.description}">Description</p>
+        <div class="error" th:if="${error != null}" th:text="${error}"></div>
+
+        <form
+                th:action="@{/eligibility/{id}/check(id=${scheme.id})}"
+                method="post"
+                enctype="multipart/form-data"
+                th:object="${beneficiary}"
+                id="eligibilityForm"
+        >
+            <input
+                    type="hidden"
+                    th:name="${_csrf.parameterName}"
+                    th:value="${_csrf.token}"
+            />
+            <div class="section">Personal details</div>
+            <div class="grid">
+                <div class="field">
+                    <label>Age *</label
+                    ><input
+                        type="number"
+                        th:field="*{age}"
+                        min="1"
+                        max="120"
+                        required
+                />
+                </div>
+                <div class="field">
+                    <label>Annual family income *</label
+                    ><input
+                        type="number"
+                        th:field="*{income}"
+                        min="0"
+                        step="0.01"
+                        required
+                /><span
+                        class="note"
+                        th:text="'Maximum ₹' + ${#numbers.formatInteger(scheme.maxIncomeThreshold,1,'COMMA')}"
+                ></span>
+                </div>
+                <div class="field">
+                    <label>Government ID *</label
+                    ><input type="text" th:field="*{governmentId}" required />
+                </div>
+                <div class="field">
+                    <label>Occupation *</label
+                    ><input type="text" th:field="*{occupation}" required /><span
+                        class="note"
+                        th:if="${scheme.occupationRestricted}"
+                        th:text="'Allowed: ' + ${scheme.requiredOccupation}"
+                ></span>
+                </div>
+                <div class="field" th:if="${scheme.genderRestricted}">
+                    <label>Gender *</label
+                    ><select th:field="*{gender}" required>
+                    <option value="">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option></select
+                ><span
+                        class="note"
+                        th:text="'Required: ' + ${scheme.requiredGender}"
+                ></span>
+                </div>
+                <div class="field" th:if="${scheme.requiresDisability}">
+                    <label>Disability status *</label
+                    ><select th:field="*{disabilityStatus}" required>
+                    <option value="">Select</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+                </div>
+                <div class="field" th:if="${scheme.residenceRestricted}">
+                    <label>Residence type *</label
+                    ><select th:field="*{residenceType}" required>
+                    <option value="">Select</option>
+                    <option value="Urban">Urban</option>
+                    <option value="Rural">Rural</option></select
+                ><span
+                        class="note"
+                        th:text="'Required: ' + ${scheme.requiredResidenceType}"
+                ></span>
+                </div>
+            </div>
+
+            <div class="section">
+                Mandatory documents — specific to this scheme
+            </div>
+            <div class="docs">
+                <div class="doc" th:each="doc : ${requiredDocuments}">
+                    <label
+                    ><span class="mandatory">Required</span>
+                        <span th:text="${doc.value}">Document</span></label
+                    >
+                    <input
+                            type="file"
+                            th:name="${'document_' + doc.key}"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            required
+                    />
+                    <div class="status" th:id="${'status_' + doc.key}">
+                        Not uploaded
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                Optional documents — can add up to 10 points
+            </div>
+            <div class="docs">
+                <div class="doc optional" th:each="doc : ${optionalDocuments}">
+                    <label
+                    ><span class="optional-label">Optional</span>
+                        <span th:text="${doc.value}">Document</span></label
+                    >
+                    <input
+                            type="file"
+                            th:name="${'document_' + doc.key}"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                    />
+                    <div class="status" th:id="${'status_' + doc.key}">
+                        Not uploaded
+                    </div>
+                </div>
+            </div>
+
+            <button class="submit" id="submitBtn" type="submit">
+                Submit Application
+            </button>
+        </form>
+    </div>
+</div>
+<script>
+    (function () {
+        const form = document.getElementById("eligibilityForm");
+        const score = document.getElementById("liveScore");
+        const bar = document.getElementById("scoreBar");
+        const msg = document.getElementById("scoreMessage");
+        const mandatory = document.getElementById("mandatoryStat");
+        const optional = document.getElementById("optionalStat");
+        const submit = document.getElementById("submitBtn");
+        let timer;
+
+        function updateFileLabels() {
+            form.querySelectorAll("input[type=file]").forEach((input) => {
+                const id = "status_" + input.name.replace("document_", "");
+                const el = document.getElementById(id);
+                if (el)
+                    el.textContent =
+                        input.files && input.files.length
+                            ? "✓ " + input.files[0].name
+                            : "Not uploaded";
+            });
+        }
+
+        async function refreshScore() {
+            updateFileLabels();
+            const fd = new FormData(form);
+            try {
+                const response = await fetch(
+                    form.action.replace("/check", "/live-score"),
+                    {
+                        method: "POST",
+                        body: fd,
+                        headers: { Accept: "application/json" },
+                    },
+                );
+                if (!response.ok) return;
+                const data = await response.json();
+                score.innerHTML = data.score + " <small>/100</small>";
+                bar.style.width = data.score + "%";
+                mandatory.textContent =
+                    "Mandatory docs: " +
+                    data.uploadedMandatoryDocuments +
+                    "/" +
+                    data.totalMandatoryDocuments;
+                optional.textContent =
+                    "Optional docs: " +
+                    data.uploadedOptionalDocuments +
+                    "/" +
+                    data.totalOptionalDocuments;
+                msg.textContent =
+                    data.mandatoryDocumentsComplete && data.eligible
+                        ? "Ready to submit."
+                        : data.message || "Complete the required criteria.";
+                submit.disabled = !(
+                    data.mandatoryDocumentsComplete && data.eligible
+                );
+            } catch (e) {
+                /* final submit still works; server remains source of truth */
+            }
+        }
+        function schedule() {
+            clearTimeout(timer);
+            timer = setTimeout(refreshScore, 150);
+        }
+        form
+            .querySelectorAll("input,select")
+            .forEach((el) =>
+                el.addEventListener(
+                    el.type === "file" ? "change" : "input",
+                    schedule,
+                ),
+            );
+        form.addEventListener("change", schedule);
+        refreshScore();
+    })();
+</script>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

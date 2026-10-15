@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SAGAR - Officer Registration</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background: #f4f7fb;
+            color: #172033;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+        .header {
+            background: #fff;
+            border-bottom: 3px solid #000080;
+            padding: 16px 30px;
+        }
+        .brand {
+            color: #000080;
+            font-size: 22px;
+            font-weight: 900;
+        }
+        .brand span {
+            color: #e67e22;
+        }
+        .page {
+            max-width: 760px;
+            margin: 38px auto;
+            padding: 0 18px;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.07);
+        }
+        h2 {
+            margin: 0;
+            color: #000080;
+        }
+        .sub {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .auth {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #e67e22;
+            border-radius: 9px;
+            padding: 14px;
+            margin: 18px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .auth span {
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+        .auth strong {
+            display: block;
+            color: #172033;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .full {
+            grid-column: 1/-1;
+        }
+        .label {
+            display: block;
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .field {
+            width: 100%;
+            border: 1px solid #dbe3ef;
+            border-radius: 7px;
+            padding: 10px;
+            font: inherit;
+            font-size: 12px;
+        }
+        .btn {
+            border: 0;
+            border-radius: 7px;
+            padding: 10px 15px;
+            background: #000080;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            border-radius: 8px;
+            padding: 11px;
+            margin: 12px 0;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .invalid {
+            text-align: center;
+            padding: 20px;
+        }
+        .invalid h3 {
+            color: #000080;
+        }
+        .invalid a {
+            color: #000080;
+            font-weight: 800;
+        }
+        @media (max-width: 600px) {
+            .grid,
+            .auth {
+                grid-template-columns: 1fr;
+            }
+            .full {
+                grid-column: auto;
+            }
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+        .sagar-identity .sagar-mark {
+            width: 60px;
+            height: 60px;
+            flex: 0 0 60px;
+            display: block;
+        }
+        .sagar-identity .sagar-wordmark {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .sagar-identity .sagar-name {
+            font:
+                    800 29px/1.08 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            letter-spacing: -0.7px;
+            margin: 0;
+        }
+        .sagar-identity .sagar-name span {
+            color: #ff9933;
+        }
+        .sagar-identity .sagar-subtitle {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            letter-spacing: 0.65px;
+            color: #53698d;
+            margin-top: 2px;
+        }
+        .sagar-identity .sagar-role {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            margin-top: 3px;
+        }
+        @media (max-width: 600px) {
+            .sagar-identity .sagar-mark {
+                width: 45px;
+                height: 45px;
+                flex-basis: 45px;
+            }
+            .sagar-identity .sagar-name {
+                font-size: 23px;
+            }
+            .sagar-identity .sagar-subtitle {
+                font-size: 9px;
+                letter-spacing: 0.1px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="sagar-sticky-header header">
+      <span class="sagar-identity"
+      ><span class="sagar-mark"
+      ><svg
+              class="brand-logo-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+      >
+            <circle
+                    cx="12"
+                    cy="12"
+                    r="11"
+                    stroke="#000080"
+                    stroke-width="2"
+                    fill="#FFFFFF"
+            />
+            <circle
+                    cx="12"
+                    cy="13"
+                    r="3.5"
+                    stroke="#000080"
+                    stroke-width="1"
+                    stroke-dasharray="1 1"
+            />
+            <path
+                    d="M6 15V10L12 5L18 10V15H6Z"
+                    stroke="#000080"
+                    stroke-width="1.5"
+                    fill="none"
+            />
+            <path
+                    d="M5 18C10 21 14 21 19 18"
+                    stroke="#138808"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+            />
+            <path
+                    d="M12 2V5"
+                    stroke="#FF9933"
+                    stroke-width="2"
+                    stroke-linecap="round"
+            /></svg></span
+      ><span class="sagar-wordmark"
+      ><span class="sagar-name">SAGAR<span>.</span></span
+      ><span class="sagar-subtitle">SUBSIDY &amp; GRANT ADMINISTRATION</span
+      ><span class="sagar-role">Officer Registration</span></span
+      ></span
+      >
+</header>
+<main class="page">
+    <section class="card">
+        <div th:if="${invitation != null}">
+            <h2>Government Officer Registration</h2>
+            <p class="sub">
+                Complete your profile for the position authorized by the SAGAR
+                Administrator. Role and jurisdiction cannot be changed from this
+                form.
+            </p>
+            <div class="auth">
+                <div>
+              <span>Officer</span
+              ><strong th:text="${invitation.officerName}">Name</strong>
+                </div>
+                <div>
+              <span>Official Email</span
+              ><strong th:text="${invitation.email}">Email</strong>
+                </div>
+                <div>
+              <span>Role</span
+              ><strong
+                        th:text="${#strings.replace(#strings.replace(invitation.role,'ROLE_',''),'_',' ')}"
+                >Role</strong
+                >
+                </div>
+                <div>
+              <span>Jurisdiction</span
+              ><strong
+                        th:text="${invitation.state + (invitation.district != null ? ' / ' + invitation.district : '')}"
+                >Scope</strong
+                >
+                </div>
+            </div>
+            <div th:if="${error}" class="error" th:text="${error}"></div>
+            <form
+                    th:action="@{/officer-register}"
+                    th:object="${officerForm}"
+                    method="post"
+            >
+                <input type="hidden" th:field="*{token}" />
+                <div class="grid">
+                    <div>
+                        <label class="label">Username</label
+                        ><input
+                            class="field"
+                            th:field="*{username}"
+                            required
+                            minlength="4"
+                            maxlength="60"
+                    />
+                    </div>
+                    <div>
+                        <label class="label">Phone Number</label
+                        ><input
+                            class="field"
+                            th:field="*{phoneNumber}"
+                            type="tel"
+                            inputmode="numeric"
+                            minlength="10"
+                            maxlength="10"
+                            pattern="[0-9]{10}"
+                            title="Enter exactly 10 digits"
+                            required
+                    />
+                    </div>
+                    <div>
+                        <label class="label">Password</label
+                        ><input
+                            class="field"
+                            type="password"
+                            th:field="*{password}"
+                            required
+                            minlength="8"
+                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9\s])\S{8,}"
+                            title="8+ characters with uppercase, lowercase, number and special character"
+                    />
+                    </div>
+                    <div>
+                        <label class="label">Confirm Password</label
+                        ><input
+                            class="field"
+                            type="password"
+                            th:field="*{confirmPassword}"
+                            required
+                            minlength="8"
+                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9\s])\S{8,}"
+                            title="8+ characters with uppercase, lowercase, number and special character"
+                    />
+                    </div>
+                    <div class="full">
+                        <button class="btn" type="submit">
+                            Submit Profile for Admin Approval
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="invalid" th:if="${invitation == null}">
+            <h3>Invitation Required</h3>
+            <p
+                    class="sub"
+                    th:text="${error != null ? error : 'Officer registration is invitation-only. Please use the secure registration link sent by the SAGAR Administrator.'}"
+            >
+                Invitation required.
+            </p>
+            <a href="/login">Return to Login</a>
+        </div>
+    </section>
+</main>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

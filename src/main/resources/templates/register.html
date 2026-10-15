@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SAGAR - Citizen Registration Console</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <style>
+        .split-canvas-wide {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            max-width: 1300px;
+            margin: 40px auto;
+            gap: 40px;
+            padding: 0 20px;
+            align-items: center;
+        }
+        @media (max-width: 992px) {
+            .split-canvas-wide {
+                grid-template-columns: 1fr;
+            }
+            .marketing-banner-orange {
+                display: none;
+            }
+        }
+
+        /* Left Hand Marketing Section */
+        .marketing-banner-orange {
+            position: relative;
+            background:
+                    linear-gradient(rgba(255, 153, 51, 0.1), rgba(0, 0, 128, 0.15)),
+                    url("/images/auth-farmer.webp") center 35%/cover no-repeat;
+            height: 520px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .traditional-badge-orange {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .traditional-badge-orange h3 {
+            margin: 0;
+            color: #000080;
+            font-size: 24px;
+        }
+        .traditional-badge-orange p {
+            margin: 5px 0 0 0;
+            color: #ff9933;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Right Hand Registration Form Card */
+        .form-card-wide {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border-top: 4px solid var(--sagar-saffron);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 576px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-field label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        .phone-field {
+            display: flex;
+            align-items: stretch;
+        }
+        .phone-prefix {
+            display: flex;
+            align-items: center;
+            padding: 0 11px;
+            background: #f1f5f9;
+            border: 1px solid #ccc;
+            border-right: 0;
+            border-radius: 6px 0 0 6px;
+            font-weight: 800;
+            color: #334155;
+        }
+        .phone-field input {
+            border-radius: 0 6px 6px 0;
+            min-width: 0;
+        }
+        .form-field input,
+        .form-field select {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .form-field input:focus,
+        .form-field select:focus {
+            border-color: var(--sagar-saffron);
+        }
+        .validation-error {
+            color: #dc3545;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 3px;
+        }
+
+        .register-submit-btn {
+            grid-column: span 2;
+            background: var(--sagar-saffron);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        .register-submit-btn:hover {
+            background: var(--sagar-saffron-dark);
+        }
+        @media (max-width: 576px) {
+            .register-submit-btn {
+                grid-column: span 1;
+            }
+        }
+
+        /* Reference photo + form presentation; preserve authentication fields */
+        body {
+            background-image:
+                    linear-gradient(90deg, rgba(3, 20, 60, 0.2), rgba(3, 20, 60, 0.1)),
+                    none !important;
+            background-position: center !important;
+            background-size: cover !important;
+            background-attachment: fixed !important;
+        }
+        .auth-container,
+        .login-container,
+        .register-container,
+        .otp-container,
+        .form-container {
+            box-shadow: 0 18px 55px rgba(7, 24, 67, 0.22);
+            border-radius: 14px;
+        }
+        @media (max-width: 700px) {
+            body {
+                background-attachment: scroll !important;
+                background-position: center !important;
+            }
+        }
+
+        /* SAGAR visual repair: photo left, registration form right; remove double photo layer. */
+        body {background:#f2f6fc !important;}
+        .split-canvas-wide {max-width:1380px;grid-template-columns:minmax(0,.9fr) minmax(540px,1.1fr);gap:26px;margin:24px auto 42px;align-items:stretch;}
+        .marketing-banner-orange {height:auto;min-height:650px;background-image:linear-gradient(0deg,rgba(4,24,62,.58),transparent 55%),url('/images/auth-farmer.webp') !important;background-size:cover !important;background-position:center 28% !important;border-radius:16px;box-shadow:0 12px 32px rgba(18,43,81,.12);}
+        .traditional-badge-orange {background:transparent;box-shadow:none;left:26px;right:20px;bottom:24px;padding:0;}
+        .traditional-badge-orange h3,.traditional-badge-orange p,.traditional-badge-orange div {color:white !important;text-shadow:0 1px 6px rgba(0,0,0,.55);}
+        .form-card-wide {align-self:start;padding:clamp(22px,2.7vw,38px);box-shadow:0 12px 34px rgba(17,42,83,.09);}
+        @media(max-width:950px){.split-canvas-wide{grid-template-columns:1fr;max-width:730px;margin:24px auto}.marketing-banner-orange{display:block;min-height:210px;background-position:center 32% !important}.traditional-badge-orange{bottom:12px}.traditional-badge-orange h3{font-size:20px}}
+        @media(max-width:575px){.split-canvas-wide{padding:0 12px}.form-card-wide{padding:20px}}
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}"/>
+    <style>
+        /* Keep the SAGAR header visible while the page scrolls. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+    </style>
+    <style id="sagar-auth-background-fix">
+        /* Full-page photograph; no side grid or promotional card. */
+        html {min-height:100%;}
+        body {min-height:100vh; background:linear-gradient(90deg,rgba(5,23,60,.24),rgba(5,23,60,.10)),url('/images/auth-farmer.webp') center center / cover fixed no-repeat !important;}
+        .split-canvas-wide {display:flex !important; justify-content:flex-end !important; align-items:flex-start !important; width:min(100% - 40px,1320px) !important; max-width:1320px !important; min-height:calc(100vh - 180px); margin:32px auto 48px !important; padding:0 !important; gap:0 !important;}
+        .marketing-banner-orange {display:none !important;}
+        .form-card-wide {width:min(100%,650px) !important; max-width:100% !important; margin:0 !important; flex:0 1 auto; background:#fff !important; border-radius:14px !important; box-shadow:0 20px 60px rgba(5,23,60,.25) !important;}
+        @media(max-width:760px) {
+            body {background-attachment:scroll !important; background-position:38% center !important;}
+            .split-canvas-wide {width:calc(100% - 24px) !important; justify-content:center !important; margin:20px auto 32px !important; min-height:calc(100vh - 130px);}
+            .form-card-wide {width:100% !important;}
+        }
+    </style></head>
+<body>
+<!-- Navbar -->
+<div class="sagar-sticky-header universal-header">
+    <a class="brand-block" href="/">
+        <svg class="brand-logo-svg" fill="none" viewbox="0 0 24 24" xmlns="http://w3.org">
+            <circle cx="12" cy="12" fill="#FFFFFF" r="11" stroke="#000080" stroke-width="2"></circle>
+            <circle cx="12" cy="13" r="3.5" stroke="#000080" stroke-dasharray="1 1" stroke-width="1"></circle>
+            <path d="M6 15V10L12 5L18 10V15H6Z" fill="none" stroke="#000080" stroke-width="1.5"></path>
+            <path d="M5 18C10 21 14 21 19 18" stroke="#138808" stroke-linecap="round" stroke-width="2.5"></path>
+            <path d="M12 2V5" stroke="#FF9933" stroke-linecap="round" stroke-width="2"></path>
+        </svg>
+        <div class="brand-text">
+            <h1>SAGAR<span>.</span></h1>
+            <p>Subsidy &amp; Grant Administration</p>
+        </div>
+    </a>
+    <div class="nav-panel">
+        <a href="/">Home</a>
+        <a href="/#schemes">Schemes</a>
+        <a class="nav-btn btn-outline" href="/login">Login Portal</a>
+    </div>
+</div>
+<div class="split-canvas-wide">
+
+    <div class="form-card-wide">
+        <h2 style="margin: 0; color: var(--sagar-saffron); font-size: 28px">
+            Register
+        </h2>
+        <p style="margin: 5px 0 15px 0; color: #6c757d; font-size: 14px">
+            Create your account on the SAGAR administration platform.
+        </p>
+        <div style="
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            font-weight: 500;
+          " th:if="${error}" th:text="${error}"></div>
+        <form method="post" th:action="@{/register}" th:if="${otpStage != true}" th:object="${user}">
+            <div class="form-grid">
+                <!-- ADDED: Full Name — spans full width so it's prominent -->
+                <div class="form-field" style="grid-column: span 2">
+                    <label>Full Name (As per Aadhaar)</label>
+                    <input placeholder="e.g. Rajesh Kumar Sharma" required="" th:field="*{fullName}" type="text"/>
+                    <div class="validation-error" th:errors="*{fullName}" th:if="${#fields.hasErrors('fullName')}"></div>
+                </div>
+                <div class="form-field">
+                    <label>Account Email (Used as Login ID)</label>
+                    <input placeholder="name@domain.com" required="" th:field="*{email}" type="email"/>
+                    <div class="validation-error" th:errors="*{email}" th:if="${#fields.hasErrors('email')}"></div>
+                </div>
+                <div class="form-field">
+                    <label>Contact Mobile Number</label>
+                    <div class="phone-field">
+                        <span class="phone-prefix">+91</span><input inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" placeholder="10-digit mobile" required="" th:field="*{contactNumber}" type="tel"/>
+                    </div>
+                    <div class="validation-error" th:errors="*{contactNumber}" th:if="${#fields.hasErrors('contactNumber')}"></div>
+                </div>
+                <div class="form-field">
+                    <label>Aadhaar Number</label>
+                    <input inputmode="numeric" maxlength="12" minlength="12" pattern="[0-9]{12}" placeholder="12-digit Aadhaar number" required="" th:field="*{governmentId}" type="text"/>
+                    <div class="validation-error" th:errors="*{governmentId}" th:if="${#fields.hasErrors('governmentId')}"></div>
+                </div>
+                <div class="form-field">
+                    <label>Age Profile (Years)</label>
+                    <input placeholder="Age" required="" th:field="*{age}" type="number"/>
+                    <div class="validation-error" th:errors="*{age}" th:if="${#fields.hasErrors('age')}"></div>
+                </div>
+                <div class="form-field">
+                    <label>Annual Household Income (INR)</label>
+                    <input placeholder="₹ Total Family Revenue" required="" th:field="*{income}" type="number"/>
+                </div>
+                <div class="form-field">
+                    <label>Current Occupation</label>
+                    <input placeholder="e.g. Farmer, Student, Self Employed" required="" th:field="*{occupation}" type="text"/>
+                </div>
+                <div class="form-field">
+                    <label>Gender</label>
+                    <select required="" th:field="*{gender}">
+                        <option value="">-- Select Gender --</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="validation-error" th:errors="*{gender}" th:if="${#fields.hasErrors('gender')}"></div>
+                </div>
+                <div class="form-field">
+                    <label>Disability Status (PwD)</label>
+                    <select required="" th:field="*{disabilityStatus}">
+                        <option value="">-- Select --</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                    <div class="validation-error" th:errors="*{disabilityStatus}" th:if="${#fields.hasErrors('disabilityStatus')}"></div>
+                </div>
+                <div class="form-field">
+                    <label>Residence Type</label>
+                    <select required="" th:field="*{residenceType}">
+                        <option value="">-- Select --</option>
+                        <option value="Urban">Urban</option>
+                        <option value="Rural">Rural</option>
+                    </select>
+                    <div class="validation-error" th:errors="*{residenceType}" th:if="${#fields.hasErrors('residenceType')}"></div>
+                </div>
+                <!-- ADDED: State dropdown — replaces nothing, sits alongside address -->
+                <div class="form-field">
+                    <label>State</label>
+                    <select id="stateSelect" required="" th:field="*{state}">
+                        <option value="">-- Select Your State --</option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                        <option value="Assam">Assam</option>
+                        <option value="Bihar">Bihar</option>
+                        <option value="Chhattisgarh">Chhattisgarh</option>
+                        <option value="Goa">Goa</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Haryana">Haryana</option>
+                        <option value="Himachal Pradesh">Himachal Pradesh</option>
+                        <option value="Jharkhand">Jharkhand</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Kerala">Kerala</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Manipur">Manipur</option>
+                        <option value="Meghalaya">Meghalaya</option>
+                        <option value="Mizoram">Mizoram</option>
+                        <option value="Nagaland">Nagaland</option>
+                        <option value="Odisha">Odisha</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Sikkim">Sikkim</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="Tripura">Tripura</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Uttarakhand">Uttarakhand</option>
+                        <option value="West Bengal">West Bengal</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Jammu &amp; Kashmir">Jammu &amp; Kashmir</option>
+                        <option value="Ladakh">Ladakh</option>
+                        <option value="Puducherry">Puducherry</option>
+                    </select>
+                    <div class="validation-error" th:errors="*{state}" th:if="${#fields.hasErrors('state')}"></div>
+                </div>
+                <div class="form-field">
+                    <label>District</label>
+                    <select disabled="" id="districtSelect" required="" th:attr="data-selected=*{district}" th:field="*{district}">
+                        <option value="">-- Select Your District --</option>
+                    </select>
+                    <div class="validation-error" th:errors="*{district}" th:if="${#fields.hasErrors('district')}"></div>
+                </div>
+                <div class="form-field">
+                    <label>Permanent Residential Address</label>
+                    <input placeholder="Full residential details" required="" th:field="*{address}" type="text"/>
+                </div>
+                <div class="form-field" style="grid-column: span 2">
+                    <label>Secure Access Password</label>
+                    <input minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9\s])\S{8,}" placeholder="Minimum 8 characters" required="" th:field="*{password}" title="Use at least 8 characters with uppercase, lowercase, number and special character" type="password"/>
+                    <small style="color: #64748b; margin-top: 5px">8+ characters with uppercase, lowercase, number and special
+                        character.</small>
+                    <div class="validation-error" th:errors="*{password}" th:if="${#fields.hasErrors('password')}"></div>
+                </div>
+                <button class="register-submit-btn" type="submit">
+                    Complete Portal Registration
+                </button>
+            </div>
+        </form>
+        <div id="registrationOtpStage" style="margin-top: 20px" th:if="${otpStage}">
+            <div style="
+              background: #fff7ed;
+              color: #9a3412;
+              padding: 12px;
+              border-radius: 7px;
+              margin-bottom: 14px;
+              font-size: 13px;
+            ">
+                Registration details saved. Enter the 6-digit OTP sent to
+                <b th:text="${maskedEmail}">email</b>.
+            </div>
+            <div style="
+              background: #fee2e2;
+              color: #991b1b;
+              padding: 12px;
+              border-radius: 7px;
+              margin-bottom: 14px;
+              font-size: 13px;
+            " th:if="${otpError}" th:text="${otpError}"></div>
+            <div style="
+              background: #dcfce7;
+              color: #166534;
+              padding: 12px;
+              border-radius: 7px;
+              margin-bottom: 14px;
+              font-size: 13px;
+            " th:if="${param.resent}">
+                A new OTP has been sent.
+            </div>
+            <div style="
+              background: #eef2ff;
+              color: #1e3a8a;
+              padding: 10px;
+              border-radius: 7px;
+              margin-bottom: 12px;
+              font-size: 12px;
+            " th:if="${devOtp}">
+                Development OTP: <b th:text="${devOtp}"></b>
+            </div>
+            <form method="post" th:action="@{/verify-registration-otp}">
+                <div class="form-field">
+                    <label>Enter Registration OTP</label><input autocomplete="one-time-code" inputmode="numeric" maxlength="6" name="otp" pattern="[0-9]{6}" required="" type="text"/>
+                </div>
+                <div style="font-size: 13px; margin: 10px 0">
+                    OTP expires in <b id="regOtpExpiry">05:00</b>
+                </div>
+                <button class="register-submit-btn" style="width: 100%" type="submit">
+                    Verify &amp; Activate Account
+                </button>
+            </form>
+            <form method="post" style="margin-top: 10px" th:action="@{/resend-registration-otp}">
+                <button class="register-submit-btn" disabled="" id="regResendBtn" style="width: 100%" type="submit">
+                    Resend OTP (01:00)
+                </button>
+            </form>
+        </div>
+        <p style="
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+            margin-top: 25px;
+          ">
+            Already have an account?
+            <a href="/login" style="
+              color: var(--sagar-saffron);
+              font-weight: bold;
+              text-decoration: none;
+            ">Login here</a>
+        </p>
+    </div>
+</div>
+<script>
+    const districtsByState = {
+        "Andhra Pradesh": [
+            "Alluri Sitharama Raju",
+            "Anakapalli",
+            "Anantapur",
+            "Annamayya",
+            "Bapatla",
+            "Chittoor",
+            "Dr. B.R. Ambedkar Konaseema",
+            "East Godavari",
+            "Eluru",
+            "Guntur",
+            "Kakinada",
+            "Krishna",
+            "Kurnool",
+            "Nandyal",
+            "NTR",
+            "Palnadu",
+            "Parvathipuram Manyam",
+            "Prakasam",
+            "Sri Potti Sriramulu Nellore",
+            "Sri Sathya Sai",
+            "Srikakulam",
+            "Tirupati",
+            "Visakhapatnam",
+            "Vizianagaram",
+            "West Godavari",
+            "YSR Kadapa",
+        ],
+        "Arunachal Pradesh": [
+            "Anjaw",
+            "Bichom",
+            "Changlang",
+            "Dibang Valley",
+            "East Kameng",
+            "East Siang",
+            "Kamle",
+            "Keyi Panyor",
+            "Kra Daadi",
+            "Kurung Kumey",
+            "Leparada",
+            "Lohit",
+            "Longding",
+            "Lower Dibang Valley",
+            "Lower Siang",
+            "Lower Subansiri",
+            "Namsai",
+            "Pakke-Kessang",
+            "Papum Pare",
+            "Shi Yomi",
+            "Siang",
+            "Tawang",
+            "Tirap",
+            "Upper Siang",
+            "Upper Subansiri",
+            "West Kameng",
+            "West Siang",
+        ],
+        Assam: [
+            "Bajali",
+            "Baksa",
+            "Barpeta",
+            "Biswanath",
+            "Bongaigaon",
+            "Cachar",
+            "Charaideo",
+            "Chirang",
+            "Darrang",
+            "Dhemaji",
+            "Dhubri",
+            "Dibrugarh",
+            "Dima Hasao",
+            "Goalpara",
+            "Golaghat",
+            "Hailakandi",
+            "Hojai",
+            "Jorhat",
+            "Kamrup",
+            "Kamrup Metropolitan",
+            "Karbi Anglong",
+            "Karimganj",
+            "Kokrajhar",
+            "Lakhimpur",
+            "Majuli",
+            "Morigaon",
+            "Nagaon",
+            "Nalbari",
+            "Sivasagar",
+            "Sonitpur",
+            "South Salmara-Mankachar",
+            "Tamulpur",
+            "Tinsukia",
+            "Udalguri",
+            "West Karbi Anglong",
+        ],
+        Bihar: [
+            "Araria",
+            "Arwal",
+            "Aurangabad",
+            "Banka",
+            "Begusarai",
+            "Bhagalpur",
+            "Bhojpur",
+            "Buxar",
+            "Darbhanga",
+            "East Champaran",
+            "Gaya",
+            "Gopalganj",
+            "Jamui",
+            "Jehanabad",
+            "Kaimur",
+            "Katihar",
+            "Khagaria",
+            "Kishanganj",
+            "Lakhisarai",
+            "Madhepura",
+            "Madhubani",
+            "Munger",
+            "Muzaffarpur",
+            "Nalanda",
+            "Nawada",
+            "Patna",
+            "Purnia",
+            "Rohtas",
+            "Saharsa",
+            "Samastipur",
+            "Saran",
+            "Sheikhpura",
+            "Sheohar",
+            "Sitamarhi",
+            "Siwan",
+            "Supaul",
+            "Vaishali",
+            "West Champaran",
+        ],
+        Chhattisgarh: [
+            "Balod",
+            "Baloda Bazar",
+            "Balrampur",
+            "Bastar",
+            "Bemetara",
+            "Bijapur",
+            "Bilaspur",
+            "Dantewada",
+            "Dhamtari",
+            "Durg",
+            "Gariaband",
+            "Gaurela-Pendra-Marwahi",
+            "Janjgir-Champa",
+            "Jashpur",
+            "Kabirdham",
+            "Kanker",
+            "Khairagarh-Chhuikhadan-Gandai",
+            "Kondagaon",
+            "Korba",
+            "Koriya",
+            "Mahasamund",
+            "Manendragarh-Chirmiri-Bharatpur",
+            "Mohla-Manpur-Ambagarh Chowki",
+            "Mungeli",
+            "Narayanpur",
+            "Raigarh",
+            "Raipur",
+            "Rajnandgaon",
+            "Sakti",
+            "Sarangarh-Bilaigarh",
+            "Sukma",
+            "Surajpur",
+            "Surguja",
+        ],
+        Goa: ["North Goa", "South Goa"],
+        Gujarat: [
+            "Ahmedabad",
+            "Amreli",
+            "Anand",
+            "Aravalli",
+            "Banaskantha",
+            "Bharuch",
+            "Bhavnagar",
+            "Botad",
+            "Chhota Udaipur",
+            "Dahod",
+            "Dang",
+            "Devbhoomi Dwarka",
+            "Gandhinagar",
+            "Gir Somnath",
+            "Jamnagar",
+            "Junagadh",
+            "Kheda",
+            "Kutch",
+            "Mahisagar",
+            "Mehsana",
+            "Morbi",
+            "Narmada",
+            "Navsari",
+            "Panchmahal",
+            "Patan",
+            "Porbandar",
+            "Rajkot",
+            "Sabarkantha",
+            "Surat",
+            "Surendranagar",
+            "Tapi",
+            "Vadodara",
+            "Valsad",
+        ],
+        Haryana: [
+            "Ambala",
+            "Bhiwani",
+            "Charkhi Dadri",
+            "Faridabad",
+            "Fatehabad",
+            "Gurugram",
+            "Hisar",
+            "Jhajjar",
+            "Jind",
+            "Kaithal",
+            "Karnal",
+            "Kurukshetra",
+            "Mahendragarh",
+            "Nuh",
+            "Palwal",
+            "Panchkula",
+            "Panipat",
+            "Rewari",
+            "Rohtak",
+            "Sirsa",
+            "Sonipat",
+            "Yamunanagar",
+        ],
+        "Himachal Pradesh": [
+            "Bilaspur",
+            "Chamba",
+            "Hamirpur",
+            "Kangra",
+            "Kinnaur",
+            "Kullu",
+            "Lahaul and Spiti",
+            "Mandi",
+            "Shimla",
+            "Sirmaur",
+            "Solan",
+            "Una",
+        ],
+        Jharkhand: [
+            "Bokaro",
+            "Chatra",
+            "Deoghar",
+            "Dhanbad",
+            "Dumka",
+            "East Singhbhum",
+            "Garhwa",
+            "Giridih",
+            "Godda",
+            "Gumla",
+            "Hazaribagh",
+            "Jamtara",
+            "Khunti",
+            "Koderma",
+            "Latehar",
+            "Lohardaga",
+            "Pakur",
+            "Palamu",
+            "Ramgarh",
+            "Ranchi",
+            "Sahibganj",
+            "Seraikela Kharsawan",
+            "Simdega",
+            "West Singhbhum",
+        ],
+        Karnataka: [
+            "Bagalkot",
+            "Ballari",
+            "Belagavi",
+            "Bengaluru Rural",
+            "Bengaluru Urban",
+            "Bidar",
+            "Chamarajanagar",
+            "Chikkaballapur",
+            "Chikkamagaluru",
+            "Chitradurga",
+            "Dakshina Kannada",
+            "Davanagere",
+            "Dharwad",
+            "Gadag",
+            "Hassan",
+            "Haveri",
+            "Kalaburagi",
+            "Kodagu",
+            "Kolar",
+            "Koppal",
+            "Mandya",
+            "Mysuru",
+            "Raichur",
+            "Ramanagara",
+            "Shivamogga",
+            "Tumakuru",
+            "Udupi",
+            "Uttara Kannada",
+            "Vijayanagara",
+            "Vijayapura",
+            "Yadgir",
+        ],
+        Kerala: [
+            "Alappuzha",
+            "Ernakulam",
+            "Idukki",
+            "Kannur",
+            "Kasaragod",
+            "Kollam",
+            "Kottayam",
+            "Kozhikode",
+            "Malappuram",
+            "Palakkad",
+            "Pathanamthitta",
+            "Thiruvananthapuram",
+            "Thrissur",
+            "Wayanad",
+        ],
+        "Madhya Pradesh": [
+            "Agar Malwa",
+            "Alirajpur",
+            "Anuppur",
+            "Ashoknagar",
+            "Balaghat",
+            "Barwani",
+            "Betul",
+            "Bhind",
+            "Bhopal",
+            "Burhanpur",
+            "Chhatarpur",
+            "Chhindwara",
+            "Damoh",
+            "Datia",
+            "Dewas",
+            "Dhar",
+            "Dindori",
+            "Guna",
+            "Gwalior",
+            "Harda",
+            "Indore",
+            "Jabalpur",
+            "Jhabua",
+            "Katni",
+            "Khandwa",
+            "Khargone",
+            "Maihar",
+            "Mandla",
+            "Mandsaur",
+            "Mauganj",
+            "Morena",
+            "Narmadapuram",
+            "Narsinghpur",
+            "Neemuch",
+            "Niwari",
+            "Pandhurna",
+            "Panna",
+            "Raisen",
+            "Rajgarh",
+            "Ratlam",
+            "Rewa",
+            "Sagar",
+            "Satna",
+            "Sehore",
+            "Seoni",
+            "Shahdol",
+            "Shajapur",
+            "Sheopur",
+            "Shivpuri",
+            "Sidhi",
+            "Singrauli",
+            "Tikamgarh",
+            "Ujjain",
+            "Umaria",
+            "Vidisha",
+        ],
+        Maharashtra: [
+            "Ahmednagar",
+            "Akola",
+            "Amravati",
+            "Aurangabad",
+            "Beed",
+            "Bhandara",
+            "Buldhana",
+            "Chandrapur",
+            "Dhule",
+            "Gadchiroli",
+            "Gondia",
+            "Hingoli",
+            "Jalgaon",
+            "Jalna",
+            "Kolhapur",
+            "Latur",
+            "Mumbai City",
+            "Mumbai Suburban",
+            "Nagpur",
+            "Nanded",
+            "Nandurbar",
+            "Nashik",
+            "Osmanabad",
+            "Palghar",
+            "Parbhani",
+            "Pune",
+            "Raigad",
+            "Ratnagiri",
+            "Sangli",
+            "Satara",
+            "Sindhudurg",
+            "Solapur",
+            "Thane",
+            "Wardha",
+            "Washim",
+            "Yavatmal",
+        ],
+        Manipur: [
+            "Bishnupur",
+            "Chandel",
+            "Churachandpur",
+            "Imphal East",
+            "Imphal West",
+            "Jiribam",
+            "Kakching",
+            "Kamjong",
+            "Kangpokpi",
+            "Noney",
+            "Pherzawl",
+            "Senapati",
+            "Tamenglong",
+            "Tengnoupal",
+            "Thoubal",
+            "Ukhrul",
+        ],
+        Meghalaya: [
+            "East Garo Hills",
+            "East Jaintia Hills",
+            "East Khasi Hills",
+            "Eastern West Khasi Hills",
+            "North Garo Hills",
+            "Ri Bhoi",
+            "South Garo Hills",
+            "South West Garo Hills",
+            "South West Khasi Hills",
+            "West Garo Hills",
+            "West Jaintia Hills",
+            "West Khasi Hills",
+        ],
+        Mizoram: [
+            "Aizawl",
+            "Champhai",
+            "Hnahthial",
+            "Khawzawl",
+            "Kolasib",
+            "Lawngtlai",
+            "Lunglei",
+            "Mamit",
+            "Saitual",
+            "Serchhip",
+            "Siaha",
+        ],
+        Nagaland: [
+            "Chumoukedima",
+            "Dimapur",
+            "Kiphire",
+            "Kohima",
+            "Longleng",
+            "Mokokchung",
+            "Mon",
+            "Niuland",
+            "Noklak",
+            "Peren",
+            "Phek",
+            "Shamator",
+            "Tseminyu",
+            "Tuensang",
+            "Wokha",
+            "Zunheboto",
+        ],
+        Odisha: [
+            "Angul",
+            "Balangir",
+            "Balasore",
+            "Bargarh",
+            "Bhadrak",
+            "Boudh",
+            "Cuttack",
+            "Deogarh",
+            "Dhenkanal",
+            "Gajapati",
+            "Ganjam",
+            "Jagatsinghpur",
+            "Jajpur",
+            "Jharsuguda",
+            "Kalahandi",
+            "Kandhamal",
+            "Kendrapara",
+            "Kendujhar",
+            "Khordha",
+            "Koraput",
+            "Malkangiri",
+            "Mayurbhanj",
+            "Nabarangpur",
+            "Nayagarh",
+            "Nuapada",
+            "Puri",
+            "Rayagada",
+            "Sambalpur",
+            "Subarnapur",
+            "Sundargarh",
+        ],
+        Punjab: [
+            "Amritsar",
+            "Barnala",
+            "Bathinda",
+            "Faridkot",
+            "Fatehgarh Sahib",
+            "Fazilka",
+            "Ferozepur",
+            "Gurdaspur",
+            "Hoshiarpur",
+            "Jalandhar",
+            "Kapurthala",
+            "Ludhiana",
+            "Malerkotla",
+            "Mansa",
+            "Moga",
+            "Pathankot",
+            "Patiala",
+            "Rupnagar",
+            "Sahibzada Ajit Singh Nagar",
+            "Sangrur",
+            "Shaheed Bhagat Singh Nagar",
+            "Sri Muktsar Sahib",
+            "Tarn Taran",
+        ],
+        Rajasthan: [
+            "Ajmer",
+            "Alwar",
+            "Balotra",
+            "Banswara",
+            "Baran",
+            "Barmer",
+            "Beawar",
+            "Bharatpur",
+            "Bhilwara",
+            "Bikaner",
+            "Bundi",
+            "Chittorgarh",
+            "Churu",
+            "Dausa",
+            "Deeg",
+            "Dholpur",
+            "Didwana-Kuchaman",
+            "Dungarpur",
+            "Hanumangarh",
+            "Jaipur",
+            "Jaisalmer",
+            "Jalore",
+            "Jhalawar",
+            "Jhunjhunu",
+            "Jodhpur",
+            "Karauli",
+            "Khairthal-Tijara",
+            "Kota",
+            "Kotputli-Behror",
+            "Nagaur",
+            "Pali",
+            "Phalodi",
+            "Pratapgarh",
+            "Rajsamand",
+            "Salumber",
+            "Sawai Madhopur",
+            "Sikar",
+            "Sirohi",
+            "Sri Ganganagar",
+            "Tonk",
+            "Udaipur",
+        ],
+        Sikkim: [
+            "Gangtok",
+            "Gyalshing",
+            "Mangan",
+            "Namchi",
+            "Pakyong",
+            "Soreng",
+        ],
+        "Tamil Nadu": [
+            "Ariyalur",
+            "Chengalpattu",
+            "Chennai",
+            "Coimbatore",
+            "Cuddalore",
+            "Dharmapuri",
+            "Dindigul",
+            "Erode",
+            "Kallakurichi",
+            "Kanchipuram",
+            "Kanniyakumari",
+            "Karur",
+            "Krishnagiri",
+            "Madurai",
+            "Mayiladuthurai",
+            "Nagapattinam",
+            "Namakkal",
+            "Nilgiris",
+            "Perambalur",
+            "Pudukkottai",
+            "Ramanathapuram",
+            "Ranipet",
+            "Salem",
+            "Sivaganga",
+            "Tenkasi",
+            "Thanjavur",
+            "Theni",
+            "Thoothukudi",
+            "Tiruchirappalli",
+            "Tirunelveli",
+            "Tirupathur",
+            "Tiruppur",
+            "Tiruvallur",
+            "Tiruvannamalai",
+            "Tiruvarur",
+            "Vellore",
+            "Viluppuram",
+            "Virudhunagar",
+        ],
+        Telangana: [
+            "Adilabad",
+            "Bhadradri Kothagudem",
+            "Hanumakonda",
+            "Hyderabad",
+            "Jagtial",
+            "Jangaon",
+            "Jayashankar Bhupalpally",
+            "Jogulamba Gadwal",
+            "Kamareddy",
+            "Karimnagar",
+            "Khammam",
+            "Kumuram Bheem Asifabad",
+            "Mahabubabad",
+            "Mahabubnagar",
+            "Mancherial",
+            "Medak",
+            "Medchal-Malkajgiri",
+            "Mulugu",
+            "Nagarkurnool",
+            "Nalgonda",
+            "Narayanpet",
+            "Nirmal",
+            "Nizamabad",
+            "Peddapalli",
+            "Rajanna Sircilla",
+            "Rangareddy",
+            "Sangareddy",
+            "Siddipet",
+            "Suryapet",
+            "Vikarabad",
+            "Wanaparthy",
+            "Warangal",
+            "Yadadri Bhuvanagiri",
+        ],
+        Tripura: [
+            "Dhalai",
+            "Gomati",
+            "Khowai",
+            "North Tripura",
+            "Sepahijala",
+            "South Tripura",
+            "Unakoti",
+            "West Tripura",
+        ],
+        "Uttar Pradesh": [
+            "Agra",
+            "Aligarh",
+            "Ambedkar Nagar",
+            "Amethi",
+            "Amroha",
+            "Auraiya",
+            "Ayodhya",
+            "Azamgarh",
+            "Baghpat",
+            "Bahraich",
+            "Ballia",
+            "Balrampur",
+            "Banda",
+            "Barabanki",
+            "Bareilly",
+            "Basti",
+            "Bhadohi",
+            "Bijnor",
+            "Budaun",
+            "Bulandshahr",
+            "Chandauli",
+            "Chitrakoot",
+            "Deoria",
+            "Etah",
+            "Etawah",
+            "Farrukhabad",
+            "Fatehpur",
+            "Firozabad",
+            "Gautam Buddha Nagar",
+            "Ghaziabad",
+            "Ghazipur",
+            "Gonda",
+            "Gorakhpur",
+            "Hamirpur",
+            "Hapur",
+            "Hardoi",
+            "Hathras",
+            "Jalaun",
+            "Jaunpur",
+            "Jhansi",
+            "Kannauj",
+            "Kanpur Dehat",
+            "Kanpur Nagar",
+            "Kasganj",
+            "Kaushambi",
+            "Kheri",
+            "Kushinagar",
+            "Lalitpur",
+            "Lucknow",
+            "Maharajganj",
+            "Mahoba",
+            "Mainpuri",
+            "Mathura",
+            "Mau",
+            "Meerut",
+            "Mirzapur",
+            "Moradabad",
+            "Muzaffarnagar",
+            "Pilibhit",
+            "Pratapgarh",
+            "Prayagraj",
+            "Rae Bareli",
+            "Rampur",
+            "Saharanpur",
+            "Sambhal",
+            "Sant Kabir Nagar",
+            "Shahjahanpur",
+            "Shamli",
+            "Shravasti",
+            "Siddharthnagar",
+            "Sitapur",
+            "Sonbhadra",
+            "Sultanpur",
+            "Unnao",
+            "Varanasi",
+        ],
+        Uttarakhand: [
+            "Almora",
+            "Bageshwar",
+            "Chamoli",
+            "Champawat",
+            "Dehradun",
+            "Haridwar",
+            "Nainital",
+            "Pauri Garhwal",
+            "Pithoragarh",
+            "Rudraprayag",
+            "Tehri Garhwal",
+            "Udham Singh Nagar",
+            "Uttarkashi",
+        ],
+        "West Bengal": [
+            "Alipurduar",
+            "Bankura",
+            "Birbhum",
+            "Cooch Behar",
+            "Dakshin Dinajpur",
+            "Darjeeling",
+            "Hooghly",
+            "Howrah",
+            "Jalpaiguri",
+            "Jhargram",
+            "Kalimpong",
+            "Kolkata",
+            "Malda",
+            "Murshidabad",
+            "Nadia",
+            "North 24 Parganas",
+            "Paschim Bardhaman",
+            "Paschim Medinipur",
+            "Purba Bardhaman",
+            "Purba Medinipur",
+            "Purulia",
+            "South 24 Parganas",
+            "Uttar Dinajpur",
+        ],
+        Delhi: [
+            "Central Delhi",
+            "East Delhi",
+            "New Delhi",
+            "North Delhi",
+            "North East Delhi",
+            "North West Delhi",
+            "Shahdara",
+            "South Delhi",
+            "South East Delhi",
+            "South West Delhi",
+            "West Delhi",
+        ],
+        "Jammu & Kashmir": [
+            "Anantnag",
+            "Bandipora",
+            "Baramulla",
+            "Budgam",
+            "Doda",
+            "Ganderbal",
+            "Jammu",
+            "Kathua",
+            "Kishtwar",
+            "Kulgam",
+            "Kupwara",
+            "Poonch",
+            "Pulwama",
+            "Rajouri",
+            "Ramban",
+            "Reasi",
+            "Samba",
+            "Shopian",
+            "Srinagar",
+            "Udhampur",
+        ],
+        Ladakh: ["Kargil", "Leh"],
+        Puducherry: ["Karaikal", "Mahe", "Puducherry", "Yanam"],
+    };
+
+    const stateSelect = document.getElementById("stateSelect");
+    const districtSelect = document.getElementById("districtSelect");
+    function loadDistricts() {
+        const selected = districtSelect.dataset.selected || "";
+        const districts = districtsByState[stateSelect.value] || [];
+        districtSelect.innerHTML =
+            '<option value="">-- Select Your District --</option>';
+        districts.forEach((d) => {
+            const option = document.createElement("option");
+            option.value = d;
+            option.textContent = d;
+            if (d === selected) option.selected = true;
+            districtSelect.appendChild(option);
+        });
+        districtSelect.disabled = districts.length === 0;
+    }
+    stateSelect.addEventListener("change", () => {
+        districtSelect.dataset.selected = "";
+        loadDistricts();
+    });
+    loadDistricts();
+</script>
+<script th:if="${otpStage}">
+    (function () {
+        let expiry = 300,
+            resend = 60;
+        const e = document.getElementById("regOtpExpiry"),
+            b = document.getElementById("regResendBtn");
+        const tick = () => {
+            if (expiry >= 0) {
+                const m = Math.floor(expiry / 60),
+                    s = expiry % 60;
+                e.textContent =
+                    String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+                expiry--;
+            }
+            if (resend > 0) {
+                b.disabled = true;
+                b.textContent =
+                    "Resend OTP (00:" + String(resend).padStart(2, "0") + ")";
+                resend--;
+            } else {
+                b.disabled = false;
+                b.textContent = "Resend OTP";
+            }
+        };
+        tick();
+        setInterval(tick, 1000);
+    })();
+</script>
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

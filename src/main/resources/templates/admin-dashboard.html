@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAGAR - Administrator Console</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background: #f4f7fb;
+            color: #172033;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+        a {
+            text-decoration: none;
+        }
+        .page {
+            max-width: 1450px;
+            margin: auto;
+            padding: 26px 20px 60px;
+        }
+        .header {
+            background: #fff;
+            border-bottom: 3px solid #000080;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+            padding: 15px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+        .brand h1 {
+            margin: 0;
+            color: #000080;
+            font-size: 22px;
+            font-weight: 900;
+        }
+        .brand h1 span {
+            color: #e67e22;
+        }
+        .brand p {
+            margin: 2px 0 0;
+            color: #64748b;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .nav {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav a,
+        .logout {
+            border: 1px solid #dbe3ef;
+            background: #fff;
+            color: #000080;
+            border-radius: 7px;
+            padding: 8px 11px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .nav a:hover {
+            background: #f8fafc;
+        }
+        .logout {
+            cursor: pointer;
+        }
+        .hero {
+            background: linear-gradient(135deg, #000080, #172554);
+            color: #fff;
+            border-radius: 14px;
+            padding: 26px 30px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .hero h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .hero p {
+            margin: 6px 0 0;
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 12px;
+        }
+        .role-chip {
+            display: inline-block;
+            margin-top: 12px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 20px;
+            padding: 6px 10px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+        .flash {
+            border-radius: 9px;
+            padding: 11px 14px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(120px, 1fr));
+            gap: 11px;
+            margin-bottom: 22px;
+        }
+        .stat {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 12px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .stat .num {
+            font-size: 24px;
+            font-weight: 900;
+            color: #000080;
+        }
+        .stat .label {
+            margin-top: 4px;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.45px;
+            color: #64748b;
+            font-weight: 800;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(350px, 0.85fr);
+            gap: 18px;
+            align-items: start;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 21px 23px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.045);
+            margin-bottom: 18px;
+        }
+        .card h3 {
+            margin: 0;
+            color: #000080;
+            font-size: 16px;
+        }
+        .sub {
+            margin: 5px 0 18px;
+            color: #64748b;
+            font-size: 11px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 11px;
+        }
+        .field-wrap.full {
+            grid-column: 1/-1;
+        }
+        .label {
+            display: block;
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 5px;
+        }
+        .field,
+        .textarea,
+        .select {
+            width: 100%;
+            border: 1px solid #dbe3ef;
+            border-radius: 7px;
+            padding: 9px 10px;
+            font: inherit;
+            font-size: 12px;
+            background: #fff;
+            color: #172033;
+        }
+        .textarea {
+            min-height: 72px;
+            resize: vertical;
+        }
+        .field:focus,
+        .textarea:focus {
+            outline: none;
+            border-color: #000080;
+            box-shadow: 0 0 0 2px rgba(0, 0, 128, 0.07);
+        }
+        .help {
+            font-size: 9px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        .check {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #334155;
+            margin-top: 4px;
+        }
+        .check input {
+            width: 15px;
+            height: 15px;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+        .btn {
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 13px;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .primary {
+            background: #000080;
+            color: #fff;
+        }
+        .orange {
+            background: #e67e22;
+            color: #fff;
+        }
+        .light {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #dbe3ef;
+        }
+        .danger {
+            background: #b91c1c;
+            color: #fff;
+        }
+        .btn:hover {
+            filter: brightness(0.97);
+        }
+        .table-wrap {
+            overflow: auto;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .table th {
+            background: #f8fafc;
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 9px;
+            letter-spacing: 0.35px;
+            text-align: left;
+            padding: 10px 9px;
+            white-space: nowrap;
+        }
+        .table td {
+            padding: 10px 9px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: top;
+        }
+        .table tr:last-child td {
+            border-bottom: 0;
+        }
+        .scheme-name {
+            font-weight: 900;
+            color: #000080;
+        }
+        .muted {
+            color: #94a3b8;
+            font-size: 10px;
+        }
+        .badge {
+            display: inline-block;
+            border-radius: 15px;
+            padding: 4px 8px;
+            font-size: 9px;
+            font-weight: 900;
+            background: #eef2ff;
+            color: #3730a3;
+        }
+        .edit {
+            color: #1d4ed8;
+            font-weight: 900;
+        }
+        .delete {
+            background: none;
+            border: 0;
+            color: #b91c1c;
+            font-size: 10px;
+            font-weight: 900;
+            cursor: pointer;
+            padding: 0;
+        }
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 9px;
+        }
+        .mini {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .mini strong {
+            display: block;
+            font-size: 18px;
+            color: #000080;
+        }
+        .mini span {
+            font-size: 9px;
+            color: #64748b;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .analytics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 9px;
+            margin-bottom: 12px;
+        }
+        .metric {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 11px;
+        }
+        .metric strong {
+            display: block;
+            color: #000080;
+            font-size: 17px;
+        }
+        .metric span {
+            font-size: 9px;
+            color: #64748b;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .list li {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid #eef2f7;
+            font-size: 10px;
+        }
+        .list li:last-child {
+            border-bottom: 0;
+        }
+        .money {
+            font-weight: 900;
+            color: #000080;
+        }
+        .notice {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            border-radius: 8px;
+            padding: 11px 12px;
+            font-size: 10px;
+            line-height: 1.5;
+            margin-top: 12px;
+        }
+        @media (max-width: 1100px) {
+            .stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 650px) {
+            .header {
+                padding: 13px 16px;
+            }
+            .page {
+                padding: 18px 12px;
+            }
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .field-wrap.full {
+                grid-column: auto;
+            }
+            .analytics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hero {
+                padding: 20px;
+            }
+        }
+
+        /* Shared visual identity from SAGAR Login/Register */
+        .sagar-unified-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            text-decoration: none !important;
+            flex-shrink: 0;
+        }
+        .sagar-unified-brand .brand-logo-svg {
+            width: 58px;
+            height: 58px;
+            flex: 0 0 58px;
+            display: block;
+        }
+        .sagar-unified-brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
+        .sagar-unified-brand-text strong {
+            font-size: 29px;
+            font-weight: 900;
+            line-height: 1;
+            color: #000080;
+            white-space: nowrap;
+        }
+        .sagar-unified-brand-text strong span {
+            color: #ff9933;
+        }
+        .sagar-unified-brand-text small {
+            font-size: 10px;
+            letter-spacing: 0.11em;
+            font-weight: 800;
+            color: #536b96;
+            white-space: nowrap;
+        }
+        .sagar-unified-brand-text em {
+            font-size: 11px;
+            font-style: normal;
+            font-weight: 800;
+            color: #000080;
+        }
+        @media (max-width: 750px) {
+            .sagar-unified-brand .brand-logo-svg {
+                width: 46px;
+                height: 46px;
+                flex-basis: 46px;
+            }
+            .sagar-unified-brand-text strong {
+                font-size: 24px;
+            }
+            .sagar-unified-brand-text small {
+                font-size: 8px;
+                white-space: normal;
+            }
+        }
+    </style>
+    <style>
+        /* SAGAR header navigation additions — scoped to avoid changing page layouts */
+        .sagar-extra-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 11px;
+            border: 1px solid #dbe3ef;
+            border-radius: 7px;
+            background: #fff;
+            color: #000080 !important;
+            text-decoration: none;
+            font:
+                    700 12px "Segoe UI",
+                    Arial,
+                    sans-serif;
+            white-space: nowrap;
+        }
+        .sagar-extra-link:hover {
+            background: #eef2ff;
+        }
+        .sagar-extra-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .sagar-extra-logout {
+            padding: 7px 11px;
+            border: 1px solid #000080;
+            border-radius: 7px;
+            background: white;
+            color: #000080;
+            font:
+                    700 12px "Segoe UI",
+                    Arial,
+                    sans-serif;
+            cursor: pointer;
+        }
+        @media (max-width: 720px) {
+            .sagar-extra-nav {
+                gap: 5px;
+            }
+            .sagar-extra-link,
+            .sagar-extra-logout {
+                font-size: 11px;
+                padding: 6px 8px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* Admin notifications: consistent navigation button and accessible popover */
+        .sagar-alert-menu{position:relative;min-width:0}
+        .sagar-alert-trigger{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #dbe3ef;border-radius:9px;background:#fff;color:#000080;font:700 13px 'Segoe UI',Arial,sans-serif;white-space:nowrap}
+        .sagar-alert-trigger::-webkit-details-marker{display:none}
+        .sagar-alert-trigger:hover,.sagar-alert-menu[open] .sagar-alert-trigger{background:#eff4ff;border-color:#9fb6ed}
+        .sagar-alert-count{background:#dc2626;color:white;min-width:20px;height:20px;border-radius:20px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;font-size:11px}
+        .sagar-alert-popover{position:absolute;right:0;top:calc(100% + 9px);z-index:1100;background:#fff;color:#172554;width:min(370px,85vw);max-height:390px;overflow:auto;padding:16px;border:1px solid #dbe3ef;border-radius:12px;box-shadow:0 16px 40px #0f172a25;font:13px 'Segoe UI',Arial,sans-serif}
+        .sagar-alert-popover>strong{display:block;padding-bottom:10px;border-bottom:1px solid #e2e8f0;font-size:14px}
+        .sagar-alert-popover form button{cursor:pointer;margin-top:6px}
+        @media(max-width:720px){.sagar-alert-popover{right:-50px}}
+    </style>
+    <style>
+        /* Dedicated flag-review view reuses the existing dashboard template. */
+        main.fund-review-only > :not(#fund-review) { display:none !important; }
+        #fund-review { padding:12px 15px !important; margin:12px 0 !important; }
+        #fund-review .fund-review-item { padding:10px !important; margin-top:6px !important; }
+        #fund-review .fund-review-item p { margin:5px 0 !important; }
+        #fund-review .fund-review-item textarea { max-width:720px; }
+    </style>
+</head>
+<body>
+<header class="header">
+    <a th:href="@{/}" class="sagar-unified-brand" aria-label="SAGAR home">
+        <svg
+                class="brand-logo-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://w3.org"
+        >
+            <circle
+                    cx="12"
+                    cy="12"
+                    r="11"
+                    stroke="#000080"
+                    stroke-width="2"
+                    fill="#FFFFFF"
+            />
+            <circle
+                    cx="12"
+                    cy="13"
+                    r="3.5"
+                    stroke="#000080"
+                    stroke-width="1"
+                    stroke-dasharray="1 1"
+            />
+            <path
+                    d="M6 15V10L12 5L18 10V15H6Z"
+                    stroke="#000080"
+                    stroke-width="1.5"
+                    fill="none"
+            />
+            <path
+                    d="M5 18C10 21 14 21 19 18"
+                    stroke="#138808"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+            />
+            <path
+                    d="M12 2V5"
+                    stroke="#FF9933"
+                    stroke-width="2"
+                    stroke-linecap="round"
+            />
+        </svg>
+        <span class="sagar-unified-brand-text"
+        ><strong>SAGAR<span>.</span></strong
+        ><small>SUBSIDY &amp; GRANT ADMINISTRATION</small
+        ><em>Administration Portal</em></span
+        ></a
+    >
+    <nav class="nav">
+        <a class="sagar-extra-link" th:href="@{/admin/dashboard}">Dashboard</a>
+        <a class="sagar-extra-link" th:href="@{/admin/audit}">Audit Logs</a>
+        <a class="sagar-extra-link" th:href="@{/admin/dashboard(fundReviewOnly=true)}">🚩 Flagged Requests</a>
+        <details class="sagar-alert-menu">
+            <summary class="sagar-alert-trigger">🔔 Notifications <span class="sagar-alert-count" th:text="${adminUnreadCount}">0</span></summary>
+            <div class="sagar-alert-popover">
+                <strong>Recent administrative events</strong>
+                <div th:each="e : ${adminEvents}" style="padding:8px;border-bottom:1px solid #e2e8f0">
+                    <strong th:text="${e.title}">Event</strong>
+                    <div th:text="${e.detail}" style="font-size:12px">Details</div>
+                    <form th:if="${e.read != 'true'}" th:action="@{/admin/notifications/read}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <input type="hidden" name="key" th:value="${e.key}"/>
+                        <button type="submit" style="padding:4px 8px;border:0;border-radius:5px;background:#000080;color:white">Mark read</button>
+                    </form>
+                    <span th:if="${e.read == 'true'}" style="color:#138808">✓ Read</span>
+                </div>
+                <div th:if="${#lists.isEmpty(adminEvents)}">No recent events.</div>
+            </div>
+        </details>
+
+        <a href="/admin/officers">👥 Officer Management</a>
+        <a href="/eligibility/admin/monitor">🖥 System Monitor</a>
+        <a href="/milestone3/analytics">📊 Analytics</a>
+        <a href="/">Public Portal</a>
+        <form th:action="@{/logout}" method="post" style="margin: 0">
+            <button class="logout" type="submit">Logout</button>
+        </form>
+    </nav>
+</header>
+
+<main class="page" th:classappend="${fundReviewOnly} ? ' fund-review-only' : ''">
+    <section class="hero">
+        <div>
+            <h2>Administrator Control Center</h2>
+            <p>
+                Manage scheme master data and monitor the complete subsidy lifecycle
+                without bypassing officer workflow controls.
+            </p>
+            <span class="role-chip"
+            >ROLE_ADMIN · MASTER DATA · SYSTEM MONITORING</span
+            >
+        </div>
+        <div
+                style="
+            text-align: right;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.72);
+          "
+        >
+            <div>Total users</div>
+            <strong
+                    style="display: block; color: #fff; font-size: 25px"
+                    th:text="${#lists.size(users)}"
+            >0</strong
+            >
+        </div>
+    </section>
+
+    <div th:if="${success}" class="flash success" th:text="${success}">
+        Success
+    </div>
+    <div th:if="${error}" class="flash error" th:text="${error}">Error</div>
+
+    <section class="card" id="fund-review" th:if="${fundReviewOnly}" style="margin:18px 0;padding:20px;border:1px solid #f59e0b;border-radius:12px;background:#fffaf0">
+        <h2 style="color:#92400e;margin:0 0 8px">Flagged Disbursements · Fund Review</h2>
+        <p>Finance Officer flags appear here. Already released amounts are not reversed. Clearing a flag does not resume payments.</p>
+        <p th:if="${#lists.isEmpty(fundReviewFlags)}">No active fund review flags.</p>
+        <div class="fund-review-item" th:each="flag : ${fundReviewFlags}" style="padding:14px;border-top:1px solid #e5e7eb;margin-top:10px">
+            <strong th:text="${'SUB-' + flag.application.id}">SUB-1</strong> ·
+            <span th:text="${flag.application.user == null ? 'Unknown beneficiary' : (flag.application.user.fullName == null ? flag.application.user.email : flag.application.user.fullName)}">Beneficiary</span>
+            <p>Released: ₹<span th:text="${#numbers.formatDecimal(flag.releasedAmount,1,2)}">0</span> · Reason: <strong th:text="${flag.fundReviewReason}">Reason</strong></p>
+            <p th:text="${flag.fundReviewRemarks}">Remarks</p>
+            <small>Raised by <span th:text="${flag.fundReviewRaisedBy}">Officer</span> at <span th:text="${flag.fundReviewRaisedAt}">Time</span></small>
+            <form method="post" th:action="@{/admin/fund-review/{id}/clear(id=${flag.id})}" style="margin-top:12px">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <textarea name="resolution" maxlength="2000" required rows="2" placeholder="Required: explain why this flag can be cleared" style="width:100%;padding:8px"></textarea>
+                <button type="submit" onclick="return confirm('Clear review flag? Future payments will remain on hold.')" style="padding:9px 14px;margin-top:6px">Clear Flag (Admin)</button>
+            </form>
+        </div>
+    </section>
+    <section class="stats">
+        <div class="stat">
+            <div class="num" th:text="${fieldCount}">0</div>
+            <div class="label">Field Queue</div>
+        </div>
+        <div class="stat">
+            <div class="num" th:text="${districtCount}">0</div>
+            <div class="label">District Queue</div>
+        </div>
+        <div class="stat">
+            <div class="num" th:text="${financeCount}">0</div>
+            <div class="label">Finance Queue</div>
+        </div>
+        <div class="stat">
+            <div class="num" th:text="${disbursementCount}">0</div>
+            <div class="label">Disbursement</div>
+        </div>
+        <div class="stat">
+            <div class="num" th:text="${approvedCount}">0</div>
+            <div class="label">Approved</div>
+        </div>
+        <div class="stat">
+            <div class="num" th:text="${rejectedCount}">0</div>
+            <div class="label">Rejected</div>
+        </div>
+        <div class="stat">
+            <div class="num" th:text="${reverificationCount}">0</div>
+            <div class="label">Re-verification</div>
+        </div>
+    </section>
+
+    <div class="grid">
+        <div>
+            <section class="card" id="scheme-editor">
+                <h3
+                        th:text="${schemeForm.id == null ? '➕ Create New Scheme' : '✏️ Update Scheme'}"
+                >
+                    Create New Scheme
+                </h3>
+                <p class="sub">
+                    Admin controls the scheme master data used by citizens,
+                    eligibility forms, document requirements and budget views.
+                </p>
+
+                <form
+                        th:action="@{/admin/schemes/save}"
+                        th:object="${schemeForm}"
+                        method="post"
+                >
+                    <input type="hidden" th:field="*{id}" />
+                    <div class="form-grid">
+                        <div class="field-wrap">
+                            <label class="label">Scheme Name *</label>
+                            <input
+                                    class="field"
+                                    th:field="*{schemeName}"
+                                    placeholder="e.g. Education Subsidy"
+                            />
+                            <div
+                                    class="help"
+                                    th:if="${#fields.hasErrors('schemeName')}"
+                                    th:errors="*{schemeName}"
+                            >
+                                Required
+                            </div>
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Emoji / Icon</label>
+                            <input class="field" th:field="*{emoji}" placeholder="🎓" />
+                        </div>
+                        <div class="field-wrap full">
+                            <label class="label">Description</label>
+                            <textarea
+                                    class="textarea"
+                                    th:field="*{description}"
+                                    placeholder="Detailed public description of the scheme"
+                            ></textarea>
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Benefit Summary</label>
+                            <input
+                                    class="field"
+                                    th:field="*{benefitSummary}"
+                                    placeholder="Up to ₹1,00,000 direct bank transfer"
+                            />
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Target Beneficiary</label>
+                            <input
+                                    class="field"
+                                    th:field="*{targetBeneficiary}"
+                                    placeholder="Short target group description"
+                            />
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Minimum Age *</label>
+                            <input
+                                    class="field"
+                                    type="number"
+                                    min="0"
+                                    th:field="*{eligibleAgeMin}"
+                            />
+                            <div
+                                    class="help"
+                                    th:if="${#fields.hasErrors('eligibleAgeMin')}"
+                                    th:errors="*{eligibleAgeMin}"
+                            >
+                                Invalid
+                            </div>
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Maximum Age *</label>
+                            <input
+                                    class="field"
+                                    type="number"
+                                    min="0"
+                                    th:field="*{eligibleAgeMax}"
+                            />
+                            <div
+                                    class="help"
+                                    th:if="${#fields.hasErrors('eligibleAgeMax')}"
+                                    th:errors="*{eligibleAgeMax}"
+                            >
+                                Invalid
+                            </div>
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Maximum Annual Income *</label>
+                            <input
+                                    class="field"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    th:field="*{maxIncomeThreshold}"
+                            />
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Regional Budget *</label>
+                            <input
+                                    class="field"
+                                    type="number"
+                                    min="1"
+                                    step="0.01"
+                                    th:field="*{totalRegionalBudget}"
+                            />
+                            <div class="help">
+                                Remaining budget is calculated by the platform; it is not
+                                manually overwritten here.
+                            </div>
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Maximum Sanction / Application *</label>
+                            <input
+                                    class="field"
+                                    type="number"
+                                    min="0.01"
+                                    step="0.01"
+                                    th:field="*{maxSanctionAmount}"
+                            />
+                            <div class="help">
+                                Finance cannot sanction more than this amount to one
+                                application.
+                            </div>
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Required Occupation</label>
+                            <input
+                                    class="field"
+                                    th:field="*{requiredOccupation}"
+                                    placeholder="Student,Farmer,Agriculturist"
+                            />
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Required Gender</label>
+                            <input
+                                    class="field"
+                                    th:field="*{requiredGender}"
+                                    placeholder="Female"
+                            />
+                        </div>
+                        <div class="field-wrap">
+                            <label class="label">Required Residence Type</label>
+                            <input
+                                    class="field"
+                                    th:field="*{requiredResidenceType}"
+                                    placeholder="Rural"
+                            />
+                        </div>
+                        <div class="field-wrap" style="display: flex; align-items: end">
+                            <label class="check"
+                            ><input type="checkbox" th:field="*{requiresDisability}" />
+                                Requires disability eligibility</label
+                            >
+                        </div>
+                        <div class="field-wrap full">
+                            <label class="label">Mandatory Documents</label>
+                            <textarea
+                                    class="textarea"
+                                    th:field="*{requiredDocuments}"
+                                    placeholder="Aadhaar Card,Bank Passbook,Income Certificate"
+                            ></textarea>
+                            <div class="help">
+                                Comma-separated names. Document keys are generated by the
+                                existing DocumentKeyUtil.
+                            </div>
+                        </div>
+                        <div class="field-wrap full">
+                            <label class="label">Optional Documents</label>
+                            <textarea
+                                    class="textarea"
+                                    th:field="*{optionalDocuments}"
+                                    placeholder="Marksheet,Certificate"
+                            ></textarea>
+                            <div class="help">
+                                Comma-separated optional documents used by the existing
+                                scoring engine.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button
+                                class="btn primary"
+                                type="submit"
+                                th:text="${schemeForm.id == null ? 'Create Scheme' : 'Save Scheme Changes'}"
+                        >
+                            Save
+                        </button>
+                        <a
+                                class="btn light"
+                                href="/admin/dashboard"
+                                th:if="${schemeForm.id != null}"
+                        >Cancel Edit</a
+                        >
+                    </div>
+                </form>
+
+                <div class="notice">
+                    <strong>Eligibility protection:</strong> once a scheme has
+                    applications, its eligibility criteria and document rules are
+                    locked against accidental retroactive score changes. Description,
+                    benefit information and budget can still be maintained.
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>📚 Scheme Master Data</h3>
+                <p class="sub">
+                    Create, inspect, update or safely delete schemes. A scheme linked
+                    to applications cannot be physically deleted because that would
+                    destroy historical records.
+                </p>
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Scheme</th>
+                            <th>Eligibility</th>
+                            <th>Budget</th>
+                            <th>Documents</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="scheme : ${schemes}">
+                            <td>
+                                <div class="scheme-name">
+                                    <span th:text="${scheme.emoji}">📋</span>
+                                    <span th:text="${scheme.schemeName}">Scheme</span>
+                                </div>
+                                <div class="muted" th:text="${scheme.benefitSummary}">
+                                    Benefit
+                                </div>
+                            </td>
+                            <td>
+                                <div
+                                        th:text="${scheme.eligibleAgeMin + '–' + scheme.eligibleAgeMax + ' years'}"
+                                >
+                                    18–60
+                                </div>
+                                <div
+                                        class="muted"
+                                        th:text="'Income ≤ ₹' + ${#numbers.formatInteger(scheme.maxIncomeThreshold,1,'COMMA')}"
+                                >
+                                    Income
+                                </div>
+                            </td>
+                            <td>
+                                <div
+                                        class="money"
+                                        th:text="'₹' + ${#numbers.formatInteger(scheme.remainingBudget,1,'COMMA')}"
+                                >
+                                    ₹0
+                                </div>
+                                <div
+                                        class="muted"
+                                        th:text="'of ₹' + ${#numbers.formatInteger(scheme.totalRegionalBudget,1,'COMMA')}"
+                                >
+                                    of budget
+                                </div>
+                            </td>
+                            <td>
+                      <span
+                              class="badge"
+                              th:text="${(scheme.requiredDocuments != null ? #strings.arraySplit(scheme.requiredDocuments, ',').length : 0) + ' mandatory'}"
+                      >0 mandatory</span
+                      ><br /><span
+                                    class="muted"
+                                    th:text="${(scheme.optionalDocuments != null ? #strings.arraySplit(scheme.optionalDocuments, ',').length : 0) + ' optional'}"
+                            >0 optional</span
+                            >
+                            </td>
+                            <td>
+                                <a
+                                        class="edit"
+                                        th:href="@{/admin/dashboard(edit=${scheme.id})}"
+                                >Edit</a
+                                >
+                                <span style="color: #cbd5e1"> · </span>
+                                <form
+                                        th:action="@{/admin/schemes/delete/{id}(id=${scheme.id})}"
+                                        method="post"
+                                        style="display: inline"
+                                        onsubmit="
+                          return confirm(
+                            'Delete this scheme? This is allowed only when no applications are linked to it.',
+                          );
+                        "
+                                >
+                                    <button class="delete" type="submit">Delete</button>
+                                </form>
+                                <br /><a
+                                    class="muted"
+                                    th:href="@{/scheme/{id}/detail(id=${scheme.id})}"
+                            >Public detail →</a
+                            >
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(schemes)}">
+                            <td colspan="5" class="muted">No schemes configured.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div>
+            <section class="card">
+                <h3>👥 Role Coverage</h3>
+                <p class="sub">
+                    Administrator can monitor all account types without changing
+                    officer decisions from this screen.
+                </p>
+                <div class="mini-grid">
+                    <div class="mini">
+                        <strong th:text="${adminUsers}">0</strong><span>Admins</span>
+                    </div>
+                    <div class="mini">
+                        <strong th:text="${fieldUsers}">0</strong><span>Field</span>
+                    </div>
+                    <div class="mini">
+                        <strong th:text="${districtUsers}">0</strong
+                        ><span>District</span>
+                    </div>
+                    <div class="mini">
+                        <strong th:text="${financeUsers}">0</strong><span>Finance</span>
+                    </div>
+                    <div class="mini">
+                        <strong th:text="${disbursementUsers}">0</strong
+                        ><span>Legacy Disbursal</span>
+                    </div>
+                    <div class="mini">
+                        <strong th:text="${beneficiaryUsers}">0</strong
+                        ><span>Citizens</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>💰 Fund Utilization</h3>
+                <p class="sub">
+                    Read-only view of the existing Milestone 3 analytics service.
+                </p>
+                <div class="analytics">
+                    <div class="metric">
+                        <strong
+                                th:text="${#numbers.formatDecimal(analytics.totalSanctioned,1,0)}"
+                        >0</strong
+                        ><span>Sanctioned</span>
+                    </div>
+                    <div class="metric">
+                        <strong
+                                th:text="${#numbers.formatDecimal(analytics.totalReleased,1,0)}"
+                        >0</strong
+                        ><span>Released</span>
+                    </div>
+                    <div class="metric">
+                        <strong
+                                th:text="${#numbers.formatDecimal(analytics.overallUtilization,1,1) + '%'}"
+                        >0%</strong
+                        ><span>Utilization</span>
+                    </div>
+                    <div class="metric">
+                        <strong th:text="${analytics.overdueMilestones}">0</strong
+                        ><span>Overdue</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <a class="btn orange" href="/milestone3/analytics"
+                    >Open Analytics</a
+                    ><a class="btn light" href="/eligibility/admin/monitor"
+                >Full Pipeline Monitor</a
+                >
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>🧭 Admin Read-Only Workflow View</h3>
+                <p class="sub">
+                    The Admin role can inspect work performed by the four operational
+                    roles without impersonating them.
+                </p>
+                <ul class="list">
+                    <li>
+                <span>Citizen applications &amp; documents</span
+                ><a class="edit" href="/eligibility/admin/monitor">View</a>
+                    </li>
+                    <li>
+                <span>Field verification queue</span
+                ><a class="edit" href="/eligibility/admin/monitor">View</a>
+                    </li>
+                    <li>
+                <span>District review queue</span
+                ><a class="edit" href="/eligibility/admin/monitor">View</a>
+                    </li>
+                    <li>
+                <span>Finance approval queue</span
+                ><a class="edit" href="/eligibility/admin/monitor">View</a>
+                    </li>
+                    <li>
+                <span>Staged disbursement analytics</span
+                ><a class="edit" href="/milestone3/analytics">View</a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="card">
+                <h3>🔐 Security Audit Trail</h3>
+                <p class="sub">
+                    Recent administrator, officer and system actions recorded
+                    by the platform.
+                </p>
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Actor</th>
+                            <th>Action</th>
+                            <th>Entity</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="log : ${recentAuditLogs}">
+                            <td
+                                    class="muted"
+                                    th:text="${log.createdAt != null ? #temporals.format(log.createdAt,'dd MMM HH:mm') : '—'}"
+                            >
+                                Time
+                            </td>
+                            <td>
+                                <strong th:text="${log.actorEmail}">Actor</strong
+                                ><br /><span class="muted" th:text="${log.actorRole}"
+                            >ROLE</span
+                            >
+                            </td>
+                            <td>
+                                <span class="badge" th:text="${log.action}">ACTION</span>
+                            </td>
+                            <td>
+                      <span
+                              th:text="${log.entityType + (log.entityId != null ? ' #' + log.entityId : '')}"
+                      >ENTITY</span
+                      >
+                            </td>
+                        </tr>
+                        <tr th:if="${auditLogs == null or #lists.isEmpty(auditLogs)}">
+                            <td colspan="4" class="muted">
+                                No audit entries yet. New workflow actions will appear
+                                here.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>🕘 Recent Applications</h3>
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Applicant / Scheme</th>
+                            <th>Status</th>
+                            <th>Open</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="app : ${recentApplications}">
+                            <td class="scheme-name" th:text="'#SUB-' + ${app.id}">
+                                #SUB-1
+                            </td>
+                            <td>
+                                <strong
+                                        th:text="${app.user != null ? app.user.email : 'N/A'}"
+                                >email</strong
+                                ><br /><span
+                                    class="muted"
+                                    th:text="${app.scheme != null ? app.scheme.schemeName : 'N/A'}"
+                            >Scheme</span
+                            >
+                            </td>
+                            <td>
+                      <span class="badge" th:text="${app.applicationStatus}"
+                      >STATUS</span
+                      >
+                            </td>
+                            <td>
+                                <a
+                                        class="edit"
+                                        th:href="@{/officer/application/{id}(id=${app.id})}"
+                                >Details</a
+                                >
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(recentApplications)}">
+                            <td colspan="4" class="muted">No applications yet.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<div style="position: fixed; right: 24px; bottom: 24px; z-index: 1000">
+    <a
+            th:href="@{/admin/audit}"
+            style="
+          display: inline-block;
+          background: #07178f;
+          color: white;
+          padding: 12px 18px;
+          border-radius: 6px;
+          text-decoration: none;
+          font-weight: 800;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+        "
+    >Audit Trail</a
+    >
+</div>
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

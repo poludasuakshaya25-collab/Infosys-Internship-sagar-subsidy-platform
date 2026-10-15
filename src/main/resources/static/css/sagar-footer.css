@@ -1,0 +1,113 @@
+/* SAGAR footer: self-contained styles for every page */
+/* SAGAR shared footer — scoped to avoid changing dashboard styles */
+.sagar-footer {
+    margin-top: 48px;
+    background: var(--sagar-navy, #000080);
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif
+}
+
+.sagar-footer__stripe {
+    height: 4px;
+    background: linear-gradient(90deg, #FF9933 0 33.33%, #fff 33.33% 66.66%, #138808 66.66% 100%)
+}
+
+.sagar-footer__inner {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 34px 5% 18px
+}
+
+.sagar-footer__main {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 36px;
+    flex-wrap: wrap
+}
+
+.sagar-footer__brand {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+    line-height: 1.1
+}
+
+.sagar-footer__brand span {
+    color: var(--sagar-saffron, #FF9933)
+}
+
+.sagar-footer__eyebrow {
+    margin-top: 6px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: #dbe5fa
+}
+
+.sagar-footer__about p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #dbe5fa;
+    max-width: 430px
+}
+
+.sagar-footer__links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 130px
+}
+
+.sagar-footer__links h2 {
+    margin: 0 0 3px;
+    font-size: 14px;
+    color: #fff
+}
+
+.sagar-footer__links a {
+    font-size: 13px;
+    color: #e4eafa;
+    text-decoration: none
+}
+
+.sagar-footer__links a:hover,
+.sagar-footer__links a:focus-visible {
+    color: #FF9933;
+    text-decoration: underline
+}
+
+.sagar-footer__bottom {
+    border-top: 1px solid rgba(255, 255, 255, .23);
+    margin-top: 24px;
+    padding-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 11px;
+    color: #dbe5fa
+}
+
+@media(max-width:600px) {
+    .sagar-footer__inner {
+        padding: 26px 6% 16px
+    }
+
+    .sagar-footer__main {
+        gap: 20px
+    }
+
+    .sagar-footer__bottom {
+        flex-direction: column
+    }
+
+    .sagar-footer__brand {
+        font-size: 25px
+    }
+}
+/* Four-column shared footer; compatible with existing SAGAR footer markup. */
+.sagar-footer__about { flex: 1 1 290px; }
+.sagar-footer__links { flex: 0 1 160px; }
+.sagar-footer__links span { color: #dbe5fa; font-size: 13px; line-height: 1.5; }
+@media(max-width: 720px) { .sagar-footer__links { flex: 1 1 140px; } }

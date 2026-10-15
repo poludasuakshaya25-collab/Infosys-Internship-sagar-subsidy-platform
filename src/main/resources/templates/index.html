@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>SAGAR - Government Subsidy &amp; Grant Portal</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <style>
+        .scheme-grid {
+            max-width: 1250px;
+            margin: 0 auto 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 22px;
+            padding: 0 20px;
+        }
+        .scheme-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 5px 22px #14213d0b;
+            display: flex;
+            flex-direction: column;
+        }
+        .scheme-head {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .scheme-icon {
+            font-size: 34px;
+        }
+        .scheme-card h3 {
+            margin: 0;
+            color: #000080;
+            font-size: 20px;
+        }
+        .scheme-about {
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.55;
+            margin: 12px 0;
+        }
+        .benefit {
+            padding: 11px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 9px;
+            color: #166534;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .eligibility {
+            margin-top: 14px;
+        }
+        .eligibility h4,
+        .documents h4 {
+            margin: 0 0 9px;
+            color: #334155;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .criteria {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .criterion {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 9px;
+        }
+        .criterion span {
+            display: block;
+            color: #94a3b8;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .criterion strong {
+            display: block;
+            color: #1e293b;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        .documents {
+            margin-top: 14px;
+        }
+        .documents ul {
+            margin: 0;
+            padding-left: 18px;
+            color: #475569;
+            font-size: 11px;
+            line-height: 1.65;
+        }
+        .apply {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            background: #000080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 11px;
+            font-weight: 800;
+            font-size: 12px;
+        }
+        .section-title {
+            text-align: center;
+            color: #000080;
+            font-size: 31px;
+            margin: 35px 0 8px;
+        }
+        .section-sub {
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+            margin: 0 20px 28px;
+        }
+        .target {
+            margin-top: 12px;
+            color: #475569;
+            font-size: 12px;
+        }
+        .additional {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #475569;
+        }
+        .additional strong {
+            color: #1e293b;
+        }
+        @media (max-width: 650px) {
+            .criteria {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* SAGAR reference-matched content refresh: scoped, no changes to header/footer */
+        :root {
+            --sagar-ref-blue: #0747a6;
+            --sagar-ref-navy: #071c57;
+            --sagar-ref-orange: #ff8a19;
+        }
+        .sagar-ref-features {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+            max-width: 1250px;
+            margin: -34px auto 42px;
+            padding: 16px 18px;
+            position: relative;
+            z-index: 2;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 12px 35px #0a2b641f;
+        }
+        .sagar-ref-feature {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #0a2457;
+        }
+        .sagar-ref-feature span {
+            width: 37px;
+            height: 37px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            color: white;
+            background: #0860b6;
+            font-size: 19px;
+            flex-shrink: 0;
+        }
+        .sagar-ref-feature:nth-child(2) span {
+            background: #f28c18;
+        }
+        .sagar-ref-feature:nth-child(3) span {
+            background: #1558bf;
+        }
+        .sagar-ref-feature:nth-child(4) span {
+            background: #9253d2;
+        }
+        .sagar-ref-feature:nth-child(5) span {
+            background: #e54848;
+        }
+        .sagar-scheme-image {
+            height: 165px;
+            width: 100%;
+            object-fit: cover;
+            display: block;
+            background: #e8effa;
+        }
+        .sagar-ref-scheme-photo {
+            height: 165px;
+            margin: -22px -22px 18px;
+            border-radius: 15px 15px 0 0;
+            overflow: hidden;
+        }
+        .sagar-ref-scheme-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        @media (max-width: 800px) {
+            .sagar-ref-features {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                margin: 12px 16px 28px;
+            }
+            .sagar-ref-feature {
+                font-size: 11px;
+            }
+        }
+        .hero-banner {
+            min-height: 420px;
+            background:
+                    linear-gradient(90deg, #f7fbff 0%, #f7fbffed 34%, #f7fbff17 70%),
+                    url("/images/hero-family.webp") right center/cover no-repeat !important;
+            display: flex;
+            align-items: center;
+        }
+        .hero-title {
+            color: #071c57 !important;
+            max-width: 600px;
+            font-size: clamp(30px, 3.2vw, 49px) !important;
+            line-height: 1.13;
+        }
+        .hero-title span {
+            color: #071c57 !important;
+        }
+        .hero-subtitle {
+            color: #274269 !important;
+            max-width: 470px;
+        }
+        .scheme-grid {
+            grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+            gap: 17px;
+        }
+        .scheme-card {
+            overflow: hidden;
+        }
+        .scheme-card h3 {
+            font-size: 17px;
+        }
+        .sagar-ref-scheme-photo img {
+            object-position: center;
+        }
+        @media (max-width: 650px) {
+            .hero-banner {
+                background:
+                        linear-gradient(90deg, #f7fbfff2, #f7fbff9e),
+                        url("/images/hero-family.webp") center/cover no-repeat !important;
+            }
+        }
+
+        /* SAGAR compact, photographic scheme cards: scoped to homepage */
+        .sagar-compact-grid { grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; max-width:1320px; }
+        .sagar-compact-card { display:flex;flex-direction:column;padding:0!important; overflow:hidden; border-radius:15px; box-shadow:0 8px 26px rgba(11,37,85,.08); }
+        .sagar-compact-card .sagar-ref-scheme-photo {height:170px!important;margin:0!important;border-radius:0!important;background:#e7eef7;}
+        .sagar-compact-card .sagar-ref-scheme-photo img {width:100%;height:100%;object-fit:cover;display:block;}
+        .sagar-compact-body {display:flex;flex-direction:column;flex:1;padding:17px;gap:10px;min-width:0;}
+        .sagar-compact-body h3 {font-size:17px!important;line-height:1.3;min-height:43px;margin:0!important;}
+        .sagar-card-status {font-size:11px;font-weight:700;color:#526b91;display:flex;align-items:center;gap:5px;}
+        .sagar-active {margin-left:auto;color:#14844b;font-size:10px;}
+        .sagar-compact-body .scheme-about {overflow-wrap:anywhere;margin:0!important;font-size:12px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:54px;}
+        .sagar-benefit {background:#edf4ff;border-radius:9px;padding:9px 11px;font-size:11px;display:grid;gap:4px;color:#3a5684;}
+        .sagar-benefit strong {color:#082e7c;font-size:12px;line-height:1.35;}
+        .sagar-compact-facts {display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:11px;color:#64748b;}
+        .sagar-compact-facts span {min-width:0;}
+        .sagar-compact-facts strong {display:block;color:#12336c;font-size:11px;margin-top:3px;}
+        .sagar-compact-body .apply {margin-top:auto;text-align:center;display:block;text-decoration:none;}
+        @media(max-width:600px){.sagar-compact-grid{grid-template-columns:1fr;padding:0 16px}.sagar-compact-card .sagar-ref-scheme-photo{height:190px!important}}
+
+        /* Stable 4-column / 3-column scheme gallery, with consistent photographs. */
+        .sagar-compact-grid {display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;max-width:1380px;gap:18px!important;align-items:stretch;}
+        .sagar-compact-card .sagar-ref-scheme-photo {height:174px!important;aspect-ratio:auto;flex:none;}
+        .sagar-compact-card .sagar-ref-scheme-photo img {object-fit:cover!important;object-position:center 42%;}
+        .sagar-compact-body {padding:15px!important;}
+        .sagar-compact-body h3 {min-height:0!important;font-size:16px!important;}
+        .sagar-compact-body .scheme-about {min-height:0!important;-webkit-line-clamp:2!important;}
+        .sagar-compact-card .apply {background:#092e79;color:#fff;padding:11px 9px;border-radius:8px;font-size:12px;font-weight:700;}
+        .sagar-compact-card .apply:hover {background:#1146a2;}
+        @media(max-width:1120px){.sagar-compact-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;}}
+        @media(max-width:800px){.sagar-compact-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
+        @media(max-width:530px){.sagar-compact-grid{grid-template-columns:1fr!important;max-width:450px}.sagar-compact-card .sagar-ref-scheme-photo{height:205px!important;}}
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* Keep the SAGAR header visible while the page scrolls. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="sagar-sticky-header universal-header">
+    <a href="/" class="brand-block"
+    ><div class="brand-text">
+        <h1>SAGAR<span>.</span></h1>
+        <p>Subsidy &amp; Grant Administration</p>
+    </div></a
+    >
+    <div class="nav-panel">
+        <a href="/">Home</a><a href="#schemes">Schemes</a
+    ><a href="/login" class="nav-btn btn-outline">Login</a
+    ><a href="/register" class="nav-btn btn-solid">Register</a>
+    </div>
+</div>
+<div class="hero-banner">
+    <div class="hero-content">
+        <h2 class="hero-title">
+            Empowering Citizens Through Transparent Subsidies &amp; Grants
+        </h2>
+        <p class="hero-subtitle">
+            Explore government subsidy and grant programs, understand eligibility
+            before applying, and track applications through verification and
+            disbursement.
+        </p>
+        <a
+                href="#schemes"
+                class="nav-btn btn-solid"
+                style="padding: 14px 28px; text-decoration: none"
+        >Explore Schemes</a
+        >
+    </div>
+</div>
+<div class="sagar-ref-features" aria-label="SAGAR service features">
+    <div class="sagar-ref-feature">
+        <span>⌂</span>Easy Application Process
+    </div>
+    <div class="sagar-ref-feature">
+        <span>✓</span>Transparent Verification
+    </div>
+    <div class="sagar-ref-feature"><span>♙</span>Multi-level Approval</div>
+    <div class="sagar-ref-feature">
+        <span>₹</span>Staged Fund Disbursement
+    </div>
+    <div class="sagar-ref-feature">
+        <span>◎</span>Track Application Status
+    </div>
+</div>
+<section id="schemes">
+    <h2 class="section-title">Available Government Schemes</h2>
+    <p class="section-sub">Explore all seven schemes. Select a scheme to see complete eligibility criteria, required documents and application details.</p>
+    <div class="scheme-grid sagar-compact-grid">
+        <article class="scheme-card sagar-compact-card" th:each="scheme : ${schemes}">
+            <div class="sagar-ref-scheme-photo">
+                <img class="sagar-dynamic-scheme-photo" th:src="@{/images/scheme-housing.webp}" th:alt="${scheme.schemeName}" th:attr="data-scheme-name=${scheme.schemeName},data-image-base=@{/images/}" loading="lazy" />
+            </div>
+            <div class="sagar-compact-body">
+                <div class="sagar-card-status"><span th:text="${scheme.emoji}">📋</span> Government Scheme <span class="sagar-active">● Active</span></div>
+                <h3 th:text="${scheme.schemeName}">Scheme name</h3>
+                <p class="scheme-about" th:text="${scheme.description}">Description</p>
+                <div class="sagar-benefit"><span>Benefit</span><strong th:text="${scheme.benefitSummary}">Scheme benefit</strong></div>
+                <div class="sagar-compact-facts">
+                    <span>Age <strong th:text="${scheme.eligibleAgeMin + '–' + scheme.eligibleAgeMax + ' years'}">18–60</strong></span>
+                    <span>Income <strong th:text="${scheme.maxIncomeThreshold != null ? 'Up to ₹' + #numbers.formatDecimal(scheme.maxIncomeThreshold,1,0) : 'As per scheme'}">As per scheme</strong></span>
+                </div>
+                <a class="apply" th:href="@{'/scheme/' + ${scheme.id} + '/detail?from=home'}">View Full Details →</a>
+            </div>
+        </article>
+        <div
+                th:if="${schemes == null or #lists.isEmpty(schemes)}"
+                style="
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 40px;
+            background: #fff;
+            border-radius: 12px;
+            color: #64748b;
+          "
+        >
+            No active schemes are currently available.
+        </div>
+    </div>
+</section>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+<script>
+    document
+        .querySelectorAll(".sagar-dynamic-scheme-photo")
+        .forEach(function (img) {
+            var n = (img.dataset.schemeName || "").toLowerCase();
+            var file = /agri|farm|irrigat|crop/.test(n)
+                ? "scheme-farming.webp"
+                : /educ|scholar|student/.test(n)
+                    ? "scheme-education.webp"
+                    : /women|entrepren|livelihood|self.employ/.test(n)
+                        ? "scheme-women.webp"
+                        : /senior|elder|pension/.test(n) ? "scheme-senior.webp" : /divyang|disab|pwd/.test(n) ? "scheme-disability.webp" : /skill|vocational|training/.test(n) ? "scheme-skill.webp" : "scheme-housing.webp";
+            img.src = (img.dataset.imageBase || "/images/") + file;
+        });
+</script>
+</body>
+</html>

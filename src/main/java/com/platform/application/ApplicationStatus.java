@@ -1,0 +1,14 @@
+package com.platform.application;
+
+public enum ApplicationStatus {
+    SUBMITTED,
+    FIELD_VERIFICATION,
+    DISTRICT_REVIEW,
+    FINANCE_PENDING,
+    FUND_DISBURSEMENT,
+    APPROVED,
+    REJECTED,
+    COOLING_PERIOD,
+    RESUBMITTED,
+    APPLICANT_REVERIFICATION
+}

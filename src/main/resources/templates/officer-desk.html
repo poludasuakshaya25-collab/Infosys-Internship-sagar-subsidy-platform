@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${roleTitle} + ' Portal Workbench'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <style>
+        /* SAGAR header navigation additions — scoped to avoid changing page layouts */
+        .sagar-extra-link{display:inline-flex;align-items:center;padding:7px 11px;border:1px solid #dbe3ef;border-radius:7px;background:#fff;color:#000080!important;text-decoration:none;font:700 12px "Segoe UI",Arial,sans-serif;white-space:nowrap}
+        .sagar-extra-link:hover{background:#eef2ff}
+        .sagar-extra-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .sagar-extra-logout{padding:7px 11px;border:1px solid #000080;border-radius:7px;background:white;color:#000080;font:700 12px "Segoe UI",Arial,sans-serif;cursor:pointer}
+        @media(max-width:720px){.sagar-extra-nav{gap:5px}.sagar-extra-link,.sagar-extra-logout{font-size:11px;padding:6px 8px}}
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity{display:inline-flex;align-items:center;gap:12px;text-align:left;text-decoration:none;vertical-align:middle;max-width:100%}
+        .sagar-identity .sagar-mark{width:60px;height:60px;flex:0 0 60px;display:block}
+        .sagar-identity .sagar-wordmark{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+        .sagar-identity .sagar-name{font:800 29px/1.08 'Segoe UI',Arial,sans-serif;color:#000080;letter-spacing:-.7px;margin:0}
+        .sagar-identity .sagar-name span{color:#ff9933}
+        .sagar-identity .sagar-subtitle{font:800 11px/1.4 'Segoe UI',Arial,sans-serif;letter-spacing:.65px;color:#53698d;margin-top:2px}
+        .sagar-identity .sagar-role{font:800 11px/1.4 'Segoe UI',Arial,sans-serif;color:#000080;margin-top:3px}
+        @media(max-width:600px){.sagar-identity .sagar-mark{width:45px;height:45px;flex-basis:45px}.sagar-identity .sagar-name{font-size:23px}.sagar-identity .sagar-subtitle{font-size:9px;letter-spacing:.1px}}
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}">
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header { position: sticky !important; top: 0 !important; left: auto !important; right: auto !important; z-index: 1100 !important; }
+        @media (max-width: 900px) { .sagar-sticky-header { flex-wrap: wrap; row-gap: 10px; } }
+    </style>
+</head>
+<body style="background: #F8FAFC; margin: 0; padding: 0; font-family: sans-serif;">
+<header class="sagar-sticky-header universal-header">
+    <div class="brand-block"><span class="sagar-identity"><span class="sagar-mark"><svg class="brand-logo-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="11" stroke="#000080" stroke-width="2" fill="#FFFFFF"/>
+            <circle cx="12" cy="13" r="3.5" stroke="#000080" stroke-width="1" stroke-dasharray="1 1"/>
+            <path d="M6 15V10L12 5L18 10V15H6Z" stroke="#000080" stroke-width="1.5" fill="none"/>
+            <path d="M5 18C10 21 14 21 19 18" stroke="#138808" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M12 2V5" stroke="#FF9933" stroke-width="2" stroke-linecap="round"/>
+        </svg></span><span class="sagar-wordmark"><span class="sagar-name">SAGAR<span>.</span></span><span class="sagar-subtitle">SUBSIDY &amp; GRANT ADMINISTRATION</span><span class="sagar-role">Officer Services</span></span></span></div>
+    </div>
+    <div class="nav-panel">
+        <a class="sagar-extra-link" th:href="@{/dashboard/officer}">Officer Dashboard</a><form th:action="@{/logout}" method="post" style="margin:0"><button type="submit" class="sagar-extra-logout">Logout</button></form>
+        <span style="font-weight: 700; color: var(--sagar-navy); font-size: 14px;" th:text="'Active Workspace Queue: ' + ${currentQueue}"></span>
+        <a href="/dashboard" class="nav-btn btn-outline" style="margin-left: 20px;">Return Home</a>
+    </div>
+</header>
+
+<main class="schemes-section" style="margin-top: 40px; max-width: 1200px;">
+    <h2 th:text="${roleTitle} + ' Operations Control Matrix'"></h2>
+    <p style="color: #64748B; font-size: 14px; margin-top: -8px; margin-bottom: 25px;">
+        Inspect dynamic demographic data profiles, verify documents, and sign workflow decisions.
+    </p>
+
+    <div style="background: #FFFFFF; border-radius: 12px; padding: 25px; box-shadow: var(--sagar-shadow);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+            <tr style="border-bottom: 2px solid #E2E8F0; color: var(--sagar-navy); font-size: 13px; text-transform: uppercase;">
+                <th style="padding: 12px;">App Reference</th>
+                <th style="padding: 12px;">Application Profile Details</th>
+                <th style="padding: 12px;">Verification Documents</th>
+                <th style="padding: 12px; text-align: center;">Pipeline Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="app : ${apps}" style="border-bottom: 1px solid #EDF2F7; font-size: 14px;">
+                <!-- ID -->
+                <td style="padding: 15px; font-weight: 700; color: var(--sagar-navy);" th:text="'#SUB-' + ${app.id}"></td>
+
+                <!-- Profile and score Details info -->
+                <td style="padding: 15px; line-height: 1.6;">
+                    <div><strong>Applicant Account:</strong> <span th:text="${app.user.email}"></span></div>
+                    <div style="font-size: 12px; color: #475569; margin-top: 4px;">
+                        <strong>Target Program:</strong> <span class="ministry-badge" th:text="${app.scheme.schemeName}"></span> <br/>
+                        <strong>System Audit Priority Score:</strong> <span style="font-weight: 700; color: var(--sagar-saffron-dark);" th:text="${app.eligibilityScore} + '/100'"></span>
+                    </div>
+                </td>
+
+                <!-- Document verification view anchors -->
+                <td style="padding: 15px; vertical-align: middle;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <!-- Document 1: Aadhaar File Link -->
+                        <a th:if="${app.aadhaarFilename != null}" th:href="'/uploads/' + ${app.aadhaarFilename}" target="_blank" style="color: var(--sagar-navy); font-weight: 600; font-size: 12px; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;">
+                            🔍 View Aadhaar Identity Document
+                        </a>
+                        <span th:unless="${app.aadhaarFilename != null}" style="font-size: 11px; color: #94A3B8; font-style: italic;">No Aadhaar File Uploaded</span>
+
+                        <!-- Document 2: Bank File Link -->
+                        <a th:if="${app.bankPassbookFilename != null}" th:href="'/uploads/' + ${app.bankPassbookFilename}" target="_blank" style="color: var(--sagar-navy); font-weight: 600; font-size: 12px; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;">
+                            📂 View Bank Passbook Record
+                        </a>
+                        <span th:unless="${app.bankPassbookFilename != null}" style="font-size: 11px; color: #94A3B8; font-style: italic;">No Passbook File Uploaded</span>
+                    </div>
+                </td>
+
+                <!-- Governance action buttons block matrix -->
+                <td style="padding: 15px; text-align: center; vertical-align: middle;">
+                    <a th:href="@{/officer/application/{id}(id=${app.id})}" style="display:inline-block;margin-bottom:8px;color:var(--sagar-navy);font-size:11px;font-weight:800;text-decoration:underline;">👁 View Full Application Details</a>
+                    <form th:action="@{/eligibility/officer/action}" method="post" style="display: inline-flex; gap: 6px; justify-content: center; align-items: center;">
+                        <input type="hidden" name="appId" th:value="${app.id}"/>
+                        <input type="hidden" name="originQueue" th:value="${currentQueue}"/>
+
+                        <!-- Core Button 1: Approve -->
+                        <button type="submit" name="workflowAction" value="APPROVE" class="btn-solid" style="padding: 8px 14px; font-size: 11px; border: none; border-radius: 4px; font-weight: 700; cursor: pointer;">
+                            Approve
+                        </button>
+
+                        <!-- Core Button 2: Reverify -->
+                        <button type="submit" name="workflowAction" value="REVERIFY" class="btn-outline" style="padding: 6px 12px; font-size: 11px; border-radius: 4px; font-weight: 700; cursor: pointer; margin-right: 0;">
+                            Reverify
+                        </button>
+
+                        <!-- Core Button 3: Reject -->
+                        <button type="submit" name="workflowAction" value="REJECT" class="btn-outline" style="padding: 6px 12px; font-size: 11px; border-radius: 4px; font-weight: 700; cursor: pointer; border-color: #EF4444; color: #EF4444; background: transparent; margin-right: 0;">
+                            Reject
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <!-- Empty Queue Placeholder -->
+            <tr th:if="${#lists.isEmpty(apps)}">
+                <td colspan="4" style="padding: 40px; text-align: center; color: #94A3B8; font-weight: bold; font-size: 14px;">
+                    📭 This officer pipeline control workspace is completely empty.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

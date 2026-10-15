@@ -1,0 +1,912 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>SAGAR - District Detailed Review</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background: #f1f5f9;
+            color: #1e293b;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+        .page {
+            max-width: 1220px;
+            margin: 28px auto;
+            padding: 0 20px 60px;
+        }
+        .back {
+            display: inline-block;
+            margin-bottom: 14px;
+            color: #000080;
+            font-weight: 800;
+            text-decoration: none;
+        }
+        .hero {
+            background: linear-gradient(135deg, #000080, #1d4ed8);
+            color: #fff;
+            border-radius: 15px;
+            padding: 24px;
+            margin-bottom: 18px;
+        }
+        .hero h1 {
+            margin: 0 0 5px;
+            font-size: 24px;
+        }
+        .hero p {
+            margin: 0;
+            color: #dbeafe;
+            font-size: 12px;
+        }
+        .top-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+        .top-actions a {
+            background: #fff;
+            color: #000080;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 13px;
+            padding: 20px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+            margin-bottom: 18px;
+        }
+        .full {
+            grid-column: 1/-1;
+        }
+        .score {
+            font-size: 46px;
+            font-weight: 900;
+            color: #000080;
+        }
+        .bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 9px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .bar span {
+            display: block;
+            height: 100%;
+            background: #16a34a;
+        }
+        .small {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .criteria {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .criteria th,
+        .criteria td {
+            padding: 9px;
+            border-bottom: 1px solid #eef2f7;
+            text-align: left;
+            font-size: 12px;
+        }
+        .criteria td:first-child {
+            font-weight: 800;
+            color: #64748b;
+            width: 40%;
+        }
+        .pass {
+            color: #166534;
+            font-weight: 900;
+        }
+        .fail {
+            color: #991b1b;
+            font-weight: 900;
+        }
+        .docs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+        .doc {
+            display: block;
+            text-decoration: none;
+            color: #0f3c91;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .doc.optional {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+        .missing {
+            padding: 12px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 9px;
+            color: #9a3412;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .decision-remarks {
+            width: 100%;
+            min-height: 105px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 11px;
+            font: inherit;
+            font-size: 12px;
+            resize: vertical;
+            display: block;
+            background: #fff;
+        }
+        .action-inline {
+            margin: 0;
+        }
+        .actions textarea:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+        .buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 13px;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .approve {
+            background: #166534;
+        }
+        .field {
+            background: #e67e22;
+        }
+        .applicant {
+            background: #0369a1;
+        }
+        .reject {
+            background: #991b1b;
+        }
+        .remark {
+            background: #f8fafc;
+            border-left: 4px solid #000080;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-top: 8px;
+        }
+        .meta {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 800;
+        }
+        .remark-text {
+            font-size: 12px;
+            color: #334155;
+            margin-top: 3px;
+        }
+        .flash {
+            padding: 12px;
+            border-radius: 9px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .ok {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        .bad {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .score-layout {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 22px;
+            align-items: center;
+        }
+        .score-ring {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: conic-gradient(#16a34a calc(var(--score) * 1%), #e2e8f0 0);
+            position: relative;
+            margin: auto;
+        }
+        .score-ring:after {
+            content: "";
+            position: absolute;
+            width: 116px;
+            height: 116px;
+            border-radius: 50%;
+            background: #fff;
+        }
+        .score-ring-value {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            font-size: 31px;
+            font-weight: 900;
+            color: #000080;
+        }
+        .score-ring-value small {
+            display: block;
+            font-size: 10px;
+            color: #64748b;
+        }
+        .breakdown-row {
+            margin: 12px 0;
+        }
+        .breakdown-head {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .mini-bar {
+            height: 9px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .mini-bar span {
+            display: block;
+            height: 100%;
+            background: #2563eb;
+            border-radius: 999px;
+        }
+        .optional-panel {
+            background: linear-gradient(135deg, #eff6ff, #f8fafc);
+            border: 1px solid #bfdbfe;
+        }
+        .optional-list {
+            display: grid;
+            gap: 10px;
+            margin: 14px 0;
+        }
+        .optional-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            border: 1px solid #dbeafe;
+            border-radius: 10px;
+            padding: 12px;
+        }
+        .optional-item input {
+            width: 18px;
+            height: 18px;
+        }
+        .optional-name {
+            font-weight: 800;
+            font-size: 12px;
+            flex: 1;
+        }
+        .pill-ok {
+            background: #dcfce7;
+            color: #166534;
+            padding: 5px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 900;
+        }
+        .pill-missing {
+            background: #ffedd5;
+            color: #9a3412;
+            padding: 5px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 900;
+        }
+        .request-btn {
+            background: #7c3aed;
+        }
+        .request-note {
+            width: 100%;
+            min-height: 78px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px;
+            font: inherit;
+            font-size: 12px;
+        }
+        @media (max-width: 700px) {
+            .score-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .full {
+                grid-column: auto;
+            }
+            .docs {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .district-fixed-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #fff;
+            border-top: 3px solid #ff9933;
+            border-bottom: 1px solid #dbe3ef;
+            box-shadow: 0 2px 9px rgba(15, 23, 42, 0.06);
+            min-height: 104px;
+            padding: 12px 42px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .district-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .district-emblem {
+            width: 58px;
+            height: 58px;
+        }
+        .district-emblem svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .district-brand-text h1 {
+            margin: 0;
+            color: #000080;
+            font-size: 29px;
+            line-height: 1;
+        }
+        .district-brand-text h1 span {
+            color: #e67e22;
+        }
+        .district-brand-text p {
+            margin: 4px 0 0;
+            color: #536b96;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.13em;
+        }
+        .district-brand-text strong {
+            display: block;
+            margin-top: 6px;
+            color: #082d72;
+            font-size: 11px;
+        }
+        .district-back-header {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            background: #fff;
+            color: #000080;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .district-back-header:hover {
+            background: #eef4ff;
+        }
+        @media (max-width: 700px) {
+            .district-fixed-header {
+                padding: 10px 16px;
+                align-items: flex-start;
+            }
+            .district-brand-text p {
+                display: none;
+            }
+            .district-back-header {
+                font-size: 10px;
+                padding: 8px 9px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+</head>
+<body>
+<header class="district-fixed-header">
+    <a th:href="@{/dashboard/officer#district-queue}" class="district-brand">
+        <div class="district-emblem">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle
+                        cx="12"
+                        cy="12"
+                        r="10.5"
+                        stroke="#000080"
+                        stroke-width="1.6"
+                        fill="#fff"
+                />
+                <path
+                        d="M6.5 14.5V10.2L12 6l5.5 4.2v4.3"
+                        stroke="#000080"
+                        stroke-width="1.5"
+                />
+                <path
+                        d="M5.5 17.5c4.3 2.5 8.7 2.5 13 0"
+                        stroke="#138808"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                />
+                <path
+                        d="M12 2.2v3"
+                        stroke="#ff9933"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                />
+            </svg>
+        </div>
+        <div class="district-brand-text">
+            <h1>SAGAR<span>.</span></h1>
+            <p>SUBSIDY &amp; GRANT ADMINISTRATION</p>
+            <strong>District Review Officer</strong>
+        </div>
+    </a>
+    <a
+            class="district-back-header"
+            th:href="@{/dashboard/officer#district-queue}"
+    >← Back to District Queue</a
+    >
+</header>
+<main class="page">
+    <div class="flash ok" th:if="${success}" th:text="${success}">
+        Success
+    </div>
+    <div class="flash bad" th:if="${error}" th:text="${error}">Error</div>
+    <section class="hero">
+        <h1 th:text="${scheme.schemeName}">Scheme</h1>
+        <p th:text="|Application #SUB-${appId} · ${beneficiary.fullName}|">
+            Application
+        </p>
+    </section>
+
+    <div class="grid">
+        <section class="card full">
+            <h3>Eligibility Score &amp; Points Breakdown</h3>
+            <div class="score-layout">
+                <div
+                        class="score-ring"
+                        th:style="|--score:${scoreBreakdown.totalScore}|"
+                >
+                    <div class="score-ring-value">
+                        <span th:text="${scoreBreakdown.totalScore}">0</span>/100<small
+                    >Total Score</small
+                    >
+                    </div>
+                </div>
+                <div>
+                    <div class="breakdown-row">
+                        <div class="breakdown-head">
+                  <span>Profile Criteria</span
+                  ><span th:text="|${scoreBreakdown.profilePts} / 50 pts|"
+                        >0 / 50 pts</span
+                        >
+                        </div>
+                        <div class="mini-bar">
+                  <span
+                          th:style="|width:${scoreBreakdown.profilePts * 2}%|"
+                  ></span>
+                        </div>
+                    </div>
+                    <div class="breakdown-row">
+                        <div class="breakdown-head">
+                  <span>Mandatory Documents</span
+                  ><span
+                                th:text="|${scoreBreakdown.mandatoryDocumentPts} / 40 pts|"
+                        >0 / 40 pts</span
+                        >
+                        </div>
+                        <div class="mini-bar">
+                  <span
+                          th:style="|width:${scoreBreakdown.mandatoryDocumentPts * 2.5}%|"
+                  ></span>
+                        </div>
+                    </div>
+                    <div class="breakdown-row">
+                        <div class="breakdown-head">
+                  <span>Optional Documents</span
+                  ><span
+                                th:text="|${scoreBreakdown.optionalDocumentPts} / 10 pts|"
+                        >0 / 10 pts</span
+                        >
+                        </div>
+                        <div class="mini-bar">
+                  <span
+                          th:style="|width:${scoreBreakdown.optionalDocumentPts * 10}%|"
+                  ></span>
+                        </div>
+                    </div>
+                    <p class="small" th:text="${scoreBreakdown.failureReasons}">
+                        Feedback
+                    </p>
+                </div>
+            </div>
+        </section>
+        <section class="card">
+            <h3>Document Completion</h3>
+            <p>
+                <strong
+                        th:text="${scoreBreakdown.uploadedMandatoryDocuments + '/' + scoreBreakdown.totalMandatoryDocuments}"
+                >0/0</strong
+                >
+                mandatory
+            </p>
+            <p>
+                <strong
+                        th:text="${scoreBreakdown.uploadedOptionalDocuments + '/' + scoreBreakdown.totalOptionalDocuments}"
+                >0/0</strong
+                >
+                optional
+            </p>
+            <div
+                    class="missing"
+                    th:if="${missingMandatoryDocuments != null and !#lists.isEmpty(missingMandatoryDocuments)}"
+            >
+                <strong>Mandatory documents missing</strong><br /><span
+                    th:text="${#strings.listJoin(missingMandatoryDocuments, ', ')}"
+            >—</span
+            >
+            </div>
+        </section>
+        <section class="card">
+            <h3>Applicant Profile</h3>
+            <table class="criteria">
+                <tr>
+                    <td>Name</td>
+                    <td th:text="${beneficiary.fullName}">Name</td>
+                </tr>
+                <tr>
+                    <td>Government ID</td>
+                    <td th:text="${beneficiary.governmentId}">ID</td>
+                </tr>
+                <tr>
+                    <td>Age</td>
+                    <td th:text="${beneficiary.age}">Age</td>
+                </tr>
+                <tr>
+                    <td>Income</td>
+                    <td th:text="${'₹' + beneficiary.income}">Income</td>
+                </tr>
+                <tr>
+                    <td>Occupation</td>
+                    <td th:text="${beneficiary.occupation}">Occupation</td>
+                </tr>
+                <tr>
+                    <td>Gender</td>
+                    <td th:text="${beneficiary.gender}">Gender</td>
+                </tr>
+                <tr>
+                    <td>Disability</td>
+                    <td th:text="${beneficiary.disabilityStatus}">Disability</td>
+                </tr>
+                <tr>
+                    <td>Residence</td>
+                    <td th:text="${beneficiary.residenceType}">Residence</td>
+                </tr>
+                <tr>
+                    <td>State</td>
+                    <td th:text="${beneficiary.state}">State</td>
+                </tr>
+            </table>
+        </section>
+        <section class="card">
+            <h3>Eligibility Checks</h3>
+            <table class="criteria">
+                <tr>
+                    <th>Criterion</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td>Age</td>
+                    <td
+                            th:classappend="${scoreBreakdown.agePass ? ' pass' : ' fail'}"
+                            th:text="${scoreBreakdown.agePass ? 'PASS' : 'FAIL'}"
+                    >
+                        PASS
+                    </td>
+                </tr>
+                <tr>
+                    <td>Income</td>
+                    <td
+                            th:classappend="${scoreBreakdown.incomePass ? ' pass' : ' fail'}"
+                            th:text="${scoreBreakdown.incomePass ? 'PASS' : 'FAIL'}"
+                    >
+                        PASS
+                    </td>
+                </tr>
+                <tr>
+                    <td>Government ID</td>
+                    <td
+                            th:classappend="${scoreBreakdown.identityPass ? ' pass' : ' fail'}"
+                            th:text="${scoreBreakdown.identityPass ? 'PASS' : 'FAIL'}"
+                    >
+                        PASS
+                    </td>
+                </tr>
+                <tr>
+                    <td>Occupation</td>
+                    <td
+                            th:classappend="${scoreBreakdown.occupationPass ? ' pass' : ' fail'}"
+                            th:text="${scoreBreakdown.occupationPass ? 'PASS' : 'FAIL'}"
+                    >
+                        PASS
+                    </td>
+                </tr>
+                <tr>
+                    <td>Gender</td>
+                    <td
+                            th:classappend="${scoreBreakdown.genderPass ? ' pass' : ' fail'}"
+                            th:text="${scoreBreakdown.genderPass ? 'PASS' : 'FAIL'}"
+                    >
+                        PASS
+                    </td>
+                </tr>
+                <tr>
+                    <td>Disability</td>
+                    <td
+                            th:classappend="${scoreBreakdown.disabilityPass ? ' pass' : ' fail'}"
+                            th:text="${scoreBreakdown.disabilityPass ? 'PASS' : 'FAIL'}"
+                    >
+                        PASS
+                    </td>
+                </tr>
+                <tr>
+                    <td>Residence</td>
+                    <td
+                            th:classappend="${scoreBreakdown.residencePass ? ' pass' : ' fail'}"
+                            th:text="${scoreBreakdown.residencePass ? 'PASS' : 'FAIL'}"
+                    >
+                        PASS
+                    </td>
+                </tr>
+            </table>
+        </section>
+        <section
+                class="card full optional-panel"
+                th:if="${optionalDocuments != null and !optionalDocuments.isEmpty()}"
+        >
+            <h3>Optional Documents — Score Improvement</h3>
+            <p class="small">
+                Optional documents can contribute up to <strong>10 points</strong>.
+                First select and save the missing optional documents. Then add a
+                District Decision remark and click
+                <strong>Send to Applicant</strong>.
+            </p>
+            <form
+                    th:action="@{/officer/district/eligibility/{id}/request-optional(id=${appId})}"
+                    method="post"
+            >
+                <input
+                        type="hidden"
+                        th:name="${_csrf.parameterName}"
+                        th:value="${_csrf.token}"
+                />
+                <div class="optional-list">
+                    <label
+                            class="optional-item"
+                            th:each="entry : ${optionalDocuments}"
+                    >
+                        <input
+                                type="checkbox"
+                                name="requestedOptionalKeys"
+                                th:value="${entry.key}"
+                                th:disabled="${uploadedDocumentKeys != null and uploadedDocumentKeys.contains(entry.key)}"
+                                th:checked="${selectedOptionalKeys != null and selectedOptionalKeys.contains(entry.key)}"
+                        />
+                        <span class="optional-name" th:text="${entry.value}"
+                        >Optional document</span
+                        >
+                        <span
+                                class="pill-ok"
+                                th:if="${uploadedDocumentKeys != null and uploadedDocumentKeys.contains(entry.key)}"
+                        >✓ Uploaded</span
+                        >
+                        <span
+                                class="pill-missing"
+                                th:if="${uploadedDocumentKeys == null or !uploadedDocumentKeys.contains(entry.key)}"
+                        >Missing · Can Request</span
+                        >
+                    </label>
+                </div>
+                <button
+                        class="btn request-btn"
+                        type="submit"
+                        th:disabled="${missingOptionalDocuments == null or #lists.isEmpty(missingOptionalDocuments)}"
+                >
+                    ✓ Save Selected Optional Documents
+                </button>
+            </form>
+        </section>
+        <section class="card full">
+            <h3>Uploaded Documents</h3>
+            <div
+                    class="docs"
+                    th:if="${applicationDocuments != null and !#lists.isEmpty(applicationDocuments)}"
+            >
+                <a
+                        class="doc"
+                        th:each="doc : ${applicationDocuments}"
+                        th:classappend="${doc.optionalDocument ? ' optional' : ''}"
+                        th:href="${doc.url}"
+                        target="_blank"
+                ><span
+                        th:text="${(doc.optionalDocument ? 'OPTIONAL · ' : 'MANDATORY · ') + doc.documentName}"
+                >Document</span
+                ><br /><small th:text="${doc.originalFilename}">file</small></a
+                >
+            </div>
+            <div
+                    th:if="${applicationDocuments == null or #lists.isEmpty(applicationDocuments)}"
+                    class="small"
+            >
+                No documents uploaded.
+            </div>
+        </section>
+        <section class="card full actions">
+            <h3>District Decision</h3>
+            <p class="small">
+                For optional-document requests: save the documents above, enter a
+                remark here, then click <strong>Send to Applicant</strong>.
+            </p>
+            <textarea
+                    id="districtRemarks"
+                    class="decision-remarks"
+                    placeholder="Enter district review remark"
+            ></textarea>
+            <div class="buttons">
+                <form
+                        th:action="@{/officer/district/action}"
+                        method="post"
+                        class="action-inline"
+                >
+                    <input type="hidden" name="appId" th:value="${appId}" />
+                    <input type="hidden" name="action" value="APPROVE" />
+                    <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}"
+                    />
+                    <input
+                            type="hidden"
+                            name="remarks"
+                            class="decision-remarks-hidden"
+                    />
+                    <button class="btn approve" type="submit">
+                        ✓ Approve / Clear for Finance
+                    </button>
+                </form>
+                <form
+                        th:action="@{/officer/district/action}"
+                        method="post"
+                        class="action-inline"
+                >
+                    <input type="hidden" name="appId" th:value="${appId}" />
+                    <input type="hidden" name="action" value="SENDBACK" />
+                    <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}"
+                    />
+                    <input
+                            type="hidden"
+                            name="remarks"
+                            class="decision-remarks-hidden"
+                    />
+                    <button class="btn field" type="submit">↩ Send to Field</button>
+                </form>
+                <form
+                        th:action="@{/officer/district/action}"
+                        method="post"
+                        class="action-inline"
+                >
+                    <input type="hidden" name="appId" th:value="${appId}" />
+                    <input type="hidden" name="action" value="SEND_BACK_APPLICANT" />
+                    <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}"
+                    />
+                    <input
+                            type="hidden"
+                            name="remarks"
+                            class="decision-remarks-hidden"
+                    />
+                    <button class="btn applicant" type="submit">
+                        📨 Send to Applicant
+                    </button>
+                </form>
+                <form
+                        th:action="@{/officer/district/action}"
+                        method="post"
+                        class="action-inline"
+                >
+                    <input type="hidden" name="appId" th:value="${appId}" />
+                    <input type="hidden" name="action" value="REJECT" />
+                    <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}"
+                    />
+                    <input
+                            type="hidden"
+                            name="remarks"
+                            class="decision-remarks-hidden"
+                    />
+                    <button class="btn reject" type="submit">✗ Reject</button>
+                </form>
+            </div>
+            <script>
+                document.addEventListener("submit", function (event) {
+                    var remarks = document.getElementById("districtRemarks");
+                    var hidden = event.target.querySelector(
+                        ".decision-remarks-hidden",
+                    );
+                    if (hidden && remarks) hidden.value = remarks.value || "";
+                });
+            </script>
+        </section>
+        <section class="card full">
+            <h3>Remark History</h3>
+            <div
+                    th:if="${applicationRemarks == null or #lists.isEmpty(applicationRemarks)}"
+                    class="small"
+            >
+                No remarks yet.
+            </div>
+            <div class="remark" th:each="remark : ${applicationRemarks}">
+                <div
+                        class="meta"
+                        th:text="${remark.actorRole + ' · ' + remark.action + ' · ' + #temporals.format(remark.createdAt,'dd MMM yyyy HH:mm')}"
+                >
+                    Actor
+                </div>
+                <div class="remark-text" th:text="${remark.remarks}">Remark</div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>

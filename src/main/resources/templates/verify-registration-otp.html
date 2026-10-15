@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAGAR Portal - Verify Registration Email</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <style>
+        body {
+            background: #f4f7fb;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #17233c;
+        }
+        .topbar {
+            background: #fff;
+            border-top: 4px solid #24344f;
+            border-bottom: 3px solid #ef7d1a;
+            padding: 18px 28px;
+        }
+        .brand {
+            font-size: 26px;
+            font-weight: 800;
+            color: #07178f;
+        }
+        .brand span {
+            color: #ef7d1a;
+        }
+        .sub {
+            color: #91a0b8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+        .wrap {
+            max-width: 520px;
+            margin: 70px auto;
+            padding: 0 18px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 34px;
+            box-shadow: 0 10px 30px rgba(31, 45, 61, 0.09);
+            border-top: 4px solid #ef7d1a;
+        }
+        h2 {
+            color: #07178f;
+            margin: 0 0 8px;
+        }
+        .muted {
+            color: #6f7f98;
+            line-height: 1.55;
+        }
+        .otp {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 14px;
+            text-align: center;
+            letter-spacing: 8px;
+            font-size: 24px;
+            font-weight: 800;
+            border: 1px solid #cfd8e6;
+            border-radius: 6px;
+            margin-top: 12px;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: 0;
+            border-radius: 6px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .primary {
+            background: #07178f;
+            color: #fff;
+        }
+        .secondary {
+            background: #edf2f8;
+            color: #17233c;
+        }
+        .notice {
+            padding: 11px 13px;
+            border-radius: 6px;
+            margin: 14px 0;
+            font-size: 13px;
+        }
+        .dev {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+    </style>
+    <style>
+        /* SAGAR shared header identity: scoped to avoid changing page layout */
+        .sagar-identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            text-decoration: none;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+        .sagar-identity .sagar-mark {
+            width: 60px;
+            height: 60px;
+            flex: 0 0 60px;
+            display: block;
+        }
+        .sagar-identity .sagar-wordmark {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .sagar-identity .sagar-name {
+            font:
+                    800 29px/1.08 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            letter-spacing: -0.7px;
+            margin: 0;
+        }
+        .sagar-identity .sagar-name span {
+            color: #ff9933;
+        }
+        .sagar-identity .sagar-subtitle {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            letter-spacing: 0.65px;
+            color: #53698d;
+            margin-top: 2px;
+        }
+        .sagar-identity .sagar-role {
+            font:
+                    800 11px/1.4 "Segoe UI",
+                    Arial,
+                    sans-serif;
+            color: #000080;
+            margin-top: 3px;
+        }
+        @media (max-width: 600px) {
+            .sagar-identity .sagar-mark {
+                width: 45px;
+                height: 45px;
+                flex-basis: 45px;
+            }
+            .sagar-identity .sagar-name {
+                font-size: 23px;
+            }
+            .sagar-identity .sagar-subtitle {
+                font-size: 9px;
+                letter-spacing: 0.1px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/sagar-footer.css}" />
+    <style>
+        /* SAGAR header stays visible while scrolling; scoped to this page's header. */
+        .sagar-sticky-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            z-index: 1100 !important;
+        }
+        @media (max-width: 900px) {
+            .sagar-sticky-header {
+                flex-wrap: wrap;
+                row-gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="sagar-sticky-header topbar">
+      <span class="sagar-identity"
+      ><span class="sagar-mark"
+      ><svg
+              class="brand-logo-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+      >
+            <circle
+                    cx="12"
+                    cy="12"
+                    r="11"
+                    stroke="#000080"
+                    stroke-width="2"
+                    fill="#FFFFFF"
+            />
+            <circle
+                    cx="12"
+                    cy="13"
+                    r="3.5"
+                    stroke="#000080"
+                    stroke-width="1"
+                    stroke-dasharray="1 1"
+            />
+            <path
+                    d="M6 15V10L12 5L18 10V15H6Z"
+                    stroke="#000080"
+                    stroke-width="1.5"
+                    fill="none"
+            />
+            <path
+                    d="M5 18C10 21 14 21 19 18"
+                    stroke="#138808"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+            />
+            <path
+                    d="M12 2V5"
+                    stroke="#FF9933"
+                    stroke-width="2"
+                    stroke-linecap="round"
+            /></svg></span
+      ><span class="sagar-wordmark"
+      ><span class="sagar-name">SAGAR<span>.</span></span
+      ><span class="sagar-subtitle">SUBSIDY &amp; GRANT ADMINISTRATION</span
+      ><span class="sagar-role">Citizen Email Verification</span></span
+      ></span
+      >
+    <div class="sub">GOVERNMENT OF INDIA — CITIZEN EMAIL VERIFICATION</div>
+</div>
+
+<div class="wrap">
+    <div class="card">
+        <h2>Verify your email</h2>
+        <p class="muted">
+            Your registration details were received. Enter the 6-digit OTP for
+            <strong th:text="${maskedEmail}">registered email</strong> to activate
+            your citizen account.
+        </p>
+
+        <div class="notice error" th:if="${error}" th:text="${error}"></div>
+        <div class="notice success" th:if="${param.resent}">
+            A new registration OTP was generated. The previous OTP is no longer
+            valid.
+        </div>
+
+        <div class="notice dev" th:if="${devOtp != null}">
+            <strong>Development Registration OTP:</strong>
+            <span th:text="${devOtp}"></span>
+            <br /><small
+        >This is visible only while local development OTP display is
+            enabled.</small
+        >
+        </div>
+
+        <form th:action="@{/verify-registration-otp}" method="post">
+            <input
+                    class="otp"
+                    type="text"
+                    name="otp"
+                    inputmode="numeric"
+                    pattern="[0-9]{6}"
+                    maxlength="6"
+                    autocomplete="one-time-code"
+                    placeholder="000000"
+                    required
+            />
+            <button class="btn primary" type="submit">
+                Verify Email &amp; Activate Account
+            </button>
+        </form>
+
+        <form th:action="@{/resend-registration-otp}" method="post">
+            <button class="btn secondary" type="submit">
+                Resend Registration OTP
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- SAGAR Footer -->
+<div th:replace="~{footer :: siteFooter}"></div>
+</body>
+</html>
